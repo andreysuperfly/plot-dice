@@ -67,9 +67,6 @@ button, select { font: inherit; color: inherit; }
 .ghost:disabled { opacity: .4; cursor: not-allowed; }
 .sel { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; color: var(--muted); }
 .sel select { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; color: var(--ink); }
-.hist { display: inline-flex; gap: 5px; align-items: center; }
-.hist button { width: 12px; height: 12px; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; padding: 0; }
-.hist button.cur { background: var(--ink); }
 .confirm { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--warn); border-radius: 16px; padding: 10px 14px; font-size: 14px; }
 
 /* доска */
@@ -149,7 +146,6 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
     <button class="btn" id="rollAll" title="Клавиши: пробел — бросить всё, 1–4 — бросить один шаг, ⌘/Ctrl+Z — назад">Бросить</button>
     <button class="ghost" id="undo" aria-label="Отменить">↶ Назад</button>
     <button class="ghost" id="redo" aria-label="Вернуть">↷ Вперёд</button>
-    <span class="hist" id="hist" aria-label="Последние броски" title="Последние броски: нажми точку, чтобы вернуться"></span>
     <button class="ghost" id="copy" title="Квест целиком обычным текстом — вставить в документ или отправить">Скопировать</button>
     <button class="ghost" id="fav">В избранное</button>
   </div>
@@ -334,8 +330,6 @@ try {
   if (!(st.egg.i < SECRETS.length)) st.egg.i = 0;
 } catch { st = fresh(); }
 const undo = [], redo = [];
-const recent = []; // последние броски для точек истории
-let recentAt = 0;
 
 function commit(mut, flash = []) {
   undo.push(clone(st)); if (undo.length > 60) undo.shift();
@@ -372,8 +366,6 @@ function rollAll() {
     if (!st.egg.lock) { st.egg.i = ri(SECRETS.length, st.egg.i); st.egg.custom = null; st.egg.at = Math.random() < .7 ? 4 : 1 + ri(3); flash.push('egg'); }
     if (st.act.at > st.choice.at && !st.act.lock && !st.choice.lock) [st.act.at, st.choice.at] = [st.choice.at, st.act.at];
   }, flash);
-  recent.push(clone(st)); if (recent.length > 10) recent.shift();
-  recentAt = recent.length - 1; render();
 }
 function rollOne(id) {
   const flash = [];
@@ -461,7 +453,6 @@ function render(flash = []) {
   $('#rollAll').disabled = allLocked;
   $('#rollAll').title = allLocked ? 'Всё закреплено. Открепи хоть одну карточку' : '';
   $('#undo').disabled = !undo.length; $('#redo').disabled = !redo.length;
-  $('#hist').innerHTML = recent.map((r, i) => `<button data-hist="${i}" class="${i === recentAt ? 'cur' : ''}" aria-label="Бросок ${i + 1}" title="Вернуть бросок ${i + 1}"></button>`).join('');
   requestAnimationFrame(drawWires);
 }
 
@@ -552,7 +543,6 @@ document.addEventListener('click', (e) => {
   else if (b.dataset.lock) { const id = b.dataset.lock; commit(() => { const o = objOf(id); o.lock = !o.lock; }); }
   else if (b.dataset.edit) startEdit(b.dataset.edit);
   else if (b.dataset.skel) askSkeleton(b.dataset.skel);
-  else if (b.dataset.hist) { const r = recent[+b.dataset.hist]; if (r) { recentAt = +b.dataset.hist; commit(() => { st = clone(r); }); } }
 });
 document.addEventListener('change', (e) => {
   const s = e.target;
@@ -619,7 +609,6 @@ $('#favList').addEventListener('click', (e) => {
 
 
 
-recent.push(clone(st));
 render();
 renderFavs();
 })();
