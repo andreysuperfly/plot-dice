@@ -82,6 +82,9 @@ button, select { font: inherit; color: inherit; }
 
 /* пульт */
 .panel { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+/* шапка с костями прилипает к верху экрана; когда страница уехала под неё, появляется тонкая линия */
+.bar { position: sticky; top: 0; z-index: 30; margin-inline: -18px; padding: 10px 18px; background: color-mix(in srgb, var(--bg) 86%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px); box-shadow: 0 1px 0 transparent; transition: box-shadow .2s; }
+.bar.stuck { box-shadow: 0 1px 0 var(--line); }
 .seg { position: relative; isolation: isolate; display: inline-flex; background: var(--surface); border: 0; border-radius: 999px; padding: 0; flex-wrap: wrap; }
 .seg .pill { position: absolute; z-index: -1; background: var(--ink); border-radius: 999px; pointer-events: none; opacity: 0; }
 .seg button { position: relative; border: 0; background: transparent; border-radius: 999px; padding: 8px 14px; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--muted); transition: color .2s; }
@@ -180,7 +183,7 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
     <button role="tab" data-tab="side" aria-selected="false" title="Отдельный генератор коротких побочных квестов по системе Side-Quest Cards Луки Барбони">Побочный квест</button>
   </div>
   <div class="view" id="vMain">
-  <div class="panel">
+  <div class="panel bar">
     <button class="btn dice" id="rollAll" aria-label="Бросить кости: сюжет, действие, выбор и секрет" title="Бросить сюжет, действие, выбор и секрет. Завязку меняет её кубик. Клавиши: пробел — бросить, 1–4 — бросить один шаг, ⌘/Ctrl+Z — назад"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
     <button class="ghost" id="undo" aria-label="Отменить">↶ Назад</button>
     <button class="ghost" id="redo" aria-label="Вернуть">↷ Вперёд</button>
@@ -188,7 +191,7 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
     <button class="ghost" id="fav">В избранное</button>
   </div>
 
-  <div class="sech"><h2 class="sec" title="Чего хочет герой и что ему мешает. Из этого собирается идея квеста">Завязка</h2><span class="ic"><button data-roll="motive" aria-label="Другая завязка" title="Другая завязка. В режиме «По Польти» удержи — выбрать ситуацию из 36"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="3.5"/><circle cx="7.2" cy="7.2" r="1.2" class="f"/><circle cx="10" cy="10" r="1.2" class="f"/><circle cx="12.8" cy="12.8" r="1.2" class="f"/></svg></button></span><div class="seg" id="zmodes" role="group" aria-label="Как строить завязку"></div></div>
+  <div class="sech"><h2 class="sec" title="Чего хочет герой и что ему мешает. Из этого собирается идея квеста">Завязка</h2><span class="ic"><button data-roll="motive" aria-label="Другая завязка" title="Другая завязка. В режиме «Польти» удержи — выбрать ситуацию из 36"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="3.5"/><circle cx="7.2" cy="7.2" r="1.2" class="f"/><circle cx="10" cy="10" r="1.2" class="f"/><circle cx="12.8" cy="12.8" r="1.2" class="f"/></svg></button></span><div class="seg" id="zmodes" role="group" aria-label="Как строить завязку"></div></div>
   <section class="motive" id="motive" aria-label="Завязка"></section>
   <p class="idea" id="idea" aria-live="polite"></p>
 
@@ -219,7 +222,7 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
   </section>
   </div>
   <div class="view" id="vSide" hidden>
-    <div class="panel">
+    <div class="panel bar">
       <button class="btn dice" id="rollQuest" aria-label="Сгенерировать побочный квест" title="Сгенерировать побочный квест. Клавиша: пробел"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
       <button class="ghost" id="copyQuest" title="Побочный квест обычным текстом">Скопировать</button>
     </div>
@@ -317,14 +320,14 @@ const SKELETONS = {
     ] },
 };
 
-// Завязка, режим «По Диксон» (Goal, Motivation & Conflict) плюс ставка: четыре колоды бросаются независимо.
+// Завязка, режим «Слоп» (упрощённо по Диксон) (Goal, Motivation & Conflict) плюс ставка: четыре колоды бросаются независимо.
 const CLASSIC = {
   want:    { label: 'Цель', hint: 'чего хочет', items: ['попасть туда, куда не пускают', 'вернуть потерянное', 'узнать правду', 'спасти близкого', 'добиться признания', 'сбежать', 'отомстить', 'достать одну вещь', 'помириться'] },
   block:   { label: 'Конфликт', hint: 'что мешает', items: ['страж у двери', 'старое правило', 'долг из прошлого', 'собственный страх', 'соперник', 'чужой язык', 'нехватка времени', 'любимый человек', 'плохая репутация'] },
   because: { label: 'Мотивация', hint: 'почему не бросит', items: ['слово уже дано', 'мучает вина', 'слишком любопытно', 'прижала нужда', 'там любовь', 'больше некому', 'это касается прошлого', 'на героя надеются'] },
   stake:   { label: 'Ставка', hint: 'что потеряет', items: ['кто-то пострадает', 'дорога закроется навсегда', 'герой станет здесь чужим', 'будет потерян друг', 'всё останется как есть, и это хуже всего', 'правда исчезнет', 'придётся начинать заново'] },
 };
-// Завязка, режим «По Польти»: 36 драматических ситуаций Жоржа Польти («Les 36 situations dramatiques», 1895).
+// Завязка, режим «Польти»: 36 драматических ситуаций Жоржа Польти («Les 36 situations dramatiques», 1895).
 // n — название, r — роли (как у Польти), s — суть ситуации, v — разновидности [код Польти, текст].
 // Пересказ близко к книге, без сословий и пьесных подробностей; жестокость и запретное — как у Польти, без смягчений.
 // Не включён 26-D (любовь мужчины к мужчине): Польти 1895 года считал её преступлением, мы — нет. Каждая строка читается после «Герой…».
@@ -366,7 +369,7 @@ const POLTI = [
   { n: 'Поиск потерянного', r: 'тот, кто ищет, тот, кого нашли', s: 'ищет того, кого давно потерял', v: [['A', 'находит родного после похищения или долгой разлуки'], ['B', 'уходит на поиски и находит своего настоящего родителя']] },
   { n: 'Потеря любимых', r: 'тот, кого теряют, свидетель, палач', s: 'теряет родных у себя на глазах', v: [['A', 'бессильно смотрит, как губят его близких'], ['B', 'предчувствует смерть близкого, не видя её'], ['C', 'от вестника узнаёт о гибели союзника или близкого']] },
 ];
-// Завязка, режим «Диксон 2»: схема Дебры Диксон (Goal, Motivation & Conflict, 1996) целиком.
+// Завязка, режим «Диксон»: схема Дебры Диксон (Goal, Motivation & Conflict, 1996) целиком.
 // У героя две тройки «цель — мотивация — конфликт»: внешняя (конкретная цель, которую можно получить или нет) и внутренняя (душевная).
 // Мотивации и конфликты написаны под свою цель, поэтому фраза держится; номер мотивации и конфликта сохраняется при смене цели.
 const DIX2 = {
@@ -422,7 +425,7 @@ const ZDECKS = {
     v:   { label: 'Вариант', hint: 'разновидность ситуации по Польти', items: null },
   },
 };
-const ZMODES = { classic: 'По Диксон', dixon2: 'Диксон 2', polti: 'По Польти' };
+const ZMODES = { classic: 'Слоп', dixon2: 'Диксон', polti: 'Польти' };
 
 const PACKS = {
   adv: { name: 'Приключение', items: [
@@ -726,19 +729,26 @@ function pills() {
     const from = pillAt.get(seg.id);
     pillAt.set(seg.id, to);
     Object.assign(pill.style, { left: to.l + 'px', top: to.t + 'px', width: to.w + 'px', height: to.h + 'px', opacity: 1 });
-    if (!from || calm.matches || (from.l === to.l && from.t === to.t && from.w === to.w)) return;
+    if (!from || (from.l === to.l && from.t === to.t && from.w === to.w)) return;
     pill.getAnimations().forEach((a) => a.cancel());
-    const fr = from.l + from.w, tr = to.l + to.w, fwd = to.l > from.l;
-    const midL = fwd ? from.l + (to.l - from.l) * 0.2 : to.l, midR = fwd ? tr : fr - (fr - tr) * 0.2;
+    const fr = from.l + from.w, tr = to.l + to.w, fwd = to.l > from.l, d = fwd ? 1 : -1;
     const k = (l, r, t, h) => ({ left: l + 'px', width: r - l + 'px', top: t + 'px', height: h + 'px' });
+    // если в системе включено «уменьшить движение» — просто короткий переезд без капли
+    if (calm.matches) { pill.animate([k(from.l, from.l + from.w, from.t, from.h), k(to.l, tr, to.t, to.h)], { duration: 180, easing: 'ease-out' }); return; }
+    const mt = (from.t + to.t) / 2;
+    // 1) передний край рвётся к цели, задний держится — капля вытягивается и худеет
+    // 2) задний край догоняет, передний чуть перелетает  3) капля оседает на место
     pill.animate([
       k(from.l, fr, from.t, from.h),
-      { ...k(midL, midR, (from.t + to.t) / 2 + to.h * 0.08, to.h * 0.84), offset: 0.45 },
+      { ...k(fwd ? from.l : to.l + 2, fwd ? tr - 2 : fr, mt + to.h * 0.12, to.h * 0.76), offset: 0.38, easing: 'cubic-bezier(.5,0,.3,1)' },
+      { ...k(to.l + d * 5, tr + d * 5, to.t + to.h * 0.04, to.h * 0.92), offset: 0.72, easing: 'cubic-bezier(.3,0,.3,1)' },
       k(to.l, tr, to.t, to.h),
-    ], { duration: 340, easing: 'cubic-bezier(.3,.8,.25,1)' });
+    ], { duration: 460, easing: 'cubic-bezier(.4,0,.2,1)' });
   });
 }
 addEventListener('resize', () => { pillAt.clear(); pills(); });
+// линия под шапкой — только когда под неё уже уехало содержимое
+addEventListener('scroll', () => document.querySelectorAll('.bar').forEach((b) => b.classList.toggle('stuck', b.offsetParent && b.getBoundingClientRect().top <= 0 && scrollY > 0)), { passive: true });
 // при броске блоки не сжимаются: высота только растёт, чтобы страница под ними не прыгала; сброс при смене ширины
 const tall = ['#motive', '#idea', '#board', '#story', '#quest'];
 function steady() { for (const q of tall) { const e = $(q); if (!e || !e.offsetParent) continue; e.style.minHeight = ''; } requestAnimationFrame(() => { for (const q of tall) { const e = $(q); if (!e || !e.offsetParent) continue; const h = e.getBoundingClientRect().height, was = +e.dataset.tall || 0; if (h > was) e.dataset.tall = h; e.style.minHeight = Math.max(h, was) + 'px'; } }); }
