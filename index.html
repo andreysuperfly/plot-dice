@@ -44,6 +44,7 @@ button, select { font: inherit; color: inherit; }
 .grp { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .grp[hidden] { display: none; }
 .credit { position: fixed; left: 16px; bottom: 12px; margin: 0; font-size: 11px; color: var(--muted); z-index: 5; }
+@media (max-width: 760px) { .credit { position: static; } }
 .seg.tabs button[aria-selected="true"] { color: var(--surface); }
 .page { max-width: 1100px; margin: 0 auto; padding-inline: 18px; padding-block: 24px 64px; display: grid; gap: 18px; }
 :focus-visible { outline: 3px solid var(--a2); outline-offset: 2px; }
@@ -184,10 +185,17 @@ body { overflow-x: clip; }
 .at select { background: var(--surface); border: 0; border-radius: 999px; padding: 3px 8px; font-weight: 700; color: var(--ink); }
 [contenteditable="true"] { outline: 2px dashed var(--a); outline-offset: 2px; border-radius: 6px; background: var(--surface); padding: 0 4px; }
 
-.saved { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 16px 18px; display: grid; gap: 10px; }
-.saved h2 { font-size: 17px; }
-.saved ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
-.saved .row { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+/* избранное: внизу страницы, карточками в сетку; метка показывает, квест это или побочный квест */
+.saved { margin-top: 36px; display: grid; gap: 12px; }
+.saved h2 { font-size: 17px; margin: 0; }
+.saved ol { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.saved li { background: var(--surface); border-radius: 20px; padding: 14px 14px 12px; display: grid; gap: 6px; align-content: start; }
+.saved .kind { justify-self: start; font-size: 12px; font-weight: 800; color: var(--a1); }
+.saved .kind.side { color: var(--a0); }
+.saved li p { margin: 0; font-size: 15px; font-weight: 700; line-height: 1.3; }
+.saved .row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.saved .row .ghost { background: var(--bg); padding: 6px 12px; font-size: 13px; }
+.saved .row .ghost.del { color: var(--muted); margin-left: auto; }
 .muted { color: var(--muted); font-size: 14px; }
 .keys { color: var(--muted); font-size: 13px; }
 kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 0 5px; }
@@ -1110,7 +1118,10 @@ $('#copy').addEventListener('click', () => copyText(asText()));
 let favs = store.get('favs', []);
 function renderFavs() {
   $('#favEmpty').hidden = favs.length > 0;
-  $('#favList').innerHTML = favs.map((f, i) => `<li><p>${esc(f.title)}</p><div class="row"><button class="ghost" data-fopen="${i}">Открыть</button><button class="ghost" data-fcopy="${i}">Скопировать</button><button class="ghost" data-fdel="${i}">Убрать</button></div></li>`).join('');
+  $('#favList').innerHTML = favs.map((f, i) => {
+    const cut = f.title.indexOf(': '), kind = cut > 0 ? f.title.slice(0, cut) : 'Квест', name = cut > 0 ? f.title.slice(cut + 2) : f.title;
+    return `<li><span class="kind${f.quest ? ' side' : ''}">${esc(kind)}</span><p>${esc(name)}</p><div class="row"><button class="ghost" data-fopen="${i}">Открыть</button><button class="ghost" data-fcopy="${i}">Скопировать</button><button class="ghost del" data-fdel="${i}">Убрать</button></div></li>`;
+  }).join('');
 }
 $('#fav').addEventListener('click', () => {
   favs.unshift({ title: `${SKELETONS[st.skel].name}: ${stepText(0).t} → ${stepText(3).t}`, text: asText(), state: clone(st) });
