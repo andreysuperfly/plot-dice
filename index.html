@@ -92,7 +92,9 @@ button, select { font: inherit; color: inherit; }
 .bar { position: sticky; top: 0; z-index: 30; margin-inline: -18px; padding: 10px 18px; background: color-mix(in srgb, var(--bg) 86%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px); box-shadow: 0 1px 0 transparent; transition: box-shadow .2s; }
 .bar.stuck { box-shadow: 0 1px 0 var(--line); }
 .seg { position: relative; isolation: isolate; display: inline-flex; background: var(--surface); border: 0; border-radius: 999px; padding: 0; flex-wrap: wrap; }
-.seg .pill { position: absolute; z-index: -1; background: var(--ink); border-radius: 999px; pointer-events: none; opacity: 0; }
+.seg.pouring button { color: var(--muted); }
+.seg .goo { position: absolute; inset: 0; z-index: -1; pointer-events: none; filter: url(#goo); }
+.seg .goo > span { position: absolute; background: var(--ink); border-radius: 999px; }
 .seg button { position: relative; border: 0; background: transparent; border-radius: 999px; padding: 8px 14px; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--muted); transition: color .2s; }
 .seg button[aria-pressed="true"] { color: var(--bg); }
 .btn { border: 0; background: var(--ink); color: var(--bg); border-radius: 999px; padding: 10px 18px; font-weight: 700; cursor: pointer; }
@@ -112,7 +114,7 @@ button, select { font: inherit; color: inherit; }
 .frag[data-card="choice"] { --ft: var(--t2); } .frag[data-card="egg"] { --ft: var(--t4); } .frag[data-card="motive"] { --ft: var(--t0); }
 .card.hot { box-shadow: 0 0 0 3px var(--a); }
 .btn:disabled { opacity: .35; cursor: not-allowed; }
-.ghost { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; font-weight: 600; font-size: 14px; cursor: pointer; }
+.ghost { border: 0; background: var(--surface); border-radius: 999px; padding: 9px 15px; font-weight: 600; font-size: 14px; cursor: pointer; }
 .ghost:disabled { opacity: .4; cursor: not-allowed; }
 .sel { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; color: var(--muted); }
 .confirm { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--warn); border-radius: 16px; padding: 10px 14px; font-size: 14px; }
@@ -157,6 +159,9 @@ button, select { font: inherit; color: inherit; }
 .c-choice .ttl, .c-act .ttl, .c-egg .ttl { font-size: 19px; }
 .desc { font-size: 14px; color: var(--muted); }
 .ask { font-size: 14px; }
+/* место под текст заранее: две строки заголовка, три строки описания — при смене жанра или броске карточки не меняют размер */
+.board .ttl { min-height: 2.4em; }
+.board .desc, .board .ask { min-height: 4.5em; line-height: 1.5; }
 .badges { display: flex; flex-wrap: wrap; gap: 4px; }
 .badge { font-size: 11px; font-weight: 700; color: var(--a); background: var(--surface); border-radius: 999px; padding: 2px 8px; }
 .badge.warn { color: var(--warn); }
@@ -180,6 +185,7 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="goo" x="-20%" y="-60%" width="140%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b"/><feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="g"/><feComposite in="SourceGraphic" in2="g" operator="atop"/></filter></svg>
 <div class="page">
   <div class="title">
     <h1 title="Генератор идей для квестов: бросаешь кости — получаешь завязку, ход сюжета, выбор игрока и секрет">Кости сюжета</h1>
@@ -221,20 +227,21 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
   <h2 class="sec" title="Карточки, собранные в рассказ. Наведи на кусок текста — подсветится, нажми — перейдёшь к его карточке">История</h2>
   <section class="story" id="story" aria-live="polite"></section>
 
-  <section class="saved">
-    <h2>Избранное</h2>
-    <p class="muted" id="favEmpty" title="Избранное хранится только в этом браузере">Пока пусто.</p>
-    <ol id="favList"></ol>
-  </section>
   </div>
   <div class="view" id="vSide" hidden>
     <div class="panel bar">
       <button class="btn dice" id="rollQuest" aria-label="Сгенерировать побочный квест" title="Сгенерировать побочный квест. Клавиша: пробел"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
       <button class="ghost" id="copyQuest" title="Побочный квест обычным текстом">Скопировать</button>
+      <button class="ghost" id="favQuest">В избранное</button>
     </div>
     <section class="motive" id="quest" aria-label="Побочный квест"></section>
     <p class="credit">По системе <a href="https://perchance.org/side-quest-cards-generator" target="_blank" rel="noopener">Side-Quest Cards</a> · автор Лука Барбони · перевод на русский</p>
   </div>
+  <section class="saved">
+    <h2 title="Общее для обеих вкладок: и квесты, и побочные квесты">Избранное</h2>
+    <p class="muted" id="favEmpty" title="Избранное хранится только в этом браузере">Пока пусто.</p>
+    <ol id="favList"></ol>
+  </section>
 </div>
 
 <script>
@@ -720,39 +727,80 @@ const icons = (id, o, editable = true) => `<span class="ic">
   ${editable ? `<button data-edit="${id}" aria-label="Написать своё" title="Написать своё">${SVG.pen}</button>` : ''}</span>`;
 const atSel = (id, at) => `<label class="at" for="at-${id}" title="К какому шагу сюжета относится карточка">на шаге <select id="at-${id}" data-at="${id}">${[1, 2, 3, 4].map((n) => `<option ${n === at ? 'selected' : ''}>${n}</option>`).join('')}</select></label>`;
 
-// переключатели: белая таблетка перетекает к выбранному варианту, как капля —
-// передний край убегает вперёд, задний догоняет, по пути капля чуть сплющивается
+// переключатели: белая таблетка — жидкость. Слой с таблеткой прогнан через SVG-фильтр «goo»:
+// капли, оказавшиеся рядом, сливаются в одну с чёткой границей (без размытия и прозрачности на экране).
+// При переключении старая таблетка стягивается к выходу и переливается струёй капель,
+// на новом месте капля закручивается и наполняет таблетку.
 const pillAt = new Map();
+const cardTall = new Map();
 const calm = matchMedia('(prefers-reduced-motion: reduce)');
+const box = (l, t, w, h) => ({ left: l + 'px', top: t + 'px', width: Math.max(0, w) + 'px', height: Math.max(0, h) + 'px' });
+const dot = (x, y, r) => box(x - r, y - r, 2 * r, 2 * r);
 function pills() {
   document.querySelectorAll('.seg').forEach((seg) => {
     if (!seg.offsetParent) return;
-    let pill = seg.querySelector(':scope > .pill');
-    if (!pill) { pill = document.createElement('span'); pill.className = 'pill'; pill.setAttribute('aria-hidden', 'true'); seg.prepend(pill); }
+    let goo = seg.querySelector(':scope > .goo');
+    if (!goo) { goo = document.createElement('span'); goo.className = 'goo'; goo.setAttribute('aria-hidden', 'true'); goo.innerHTML = '<span class="pill"></span>'; seg.prepend(goo); }
+    const pill = goo.firstChild;
     const on = seg.querySelector('button[aria-pressed="true"], button[aria-selected="true"]');
-    if (!on) { pill.style.opacity = 0; return; }
+    if (!on) { pill.hidden = true; return; }
+    pill.hidden = false;
     const to = { l: on.offsetLeft, t: on.offsetTop, w: on.offsetWidth, h: on.offsetHeight };
     const from = pillAt.get(seg.id);
     pillAt.set(seg.id, to);
-    Object.assign(pill.style, { left: to.l + 'px', top: to.t + 'px', width: to.w + 'px', height: to.h + 'px', opacity: 1 });
+    Object.assign(pill.style, box(to.l, to.t, to.w, to.h));
     if (!from || (from.l === to.l && from.t === to.t && from.w === to.w)) return;
-    pill.getAnimations().forEach((a) => a.cancel());
-    const fr = from.l + from.w, tr = to.l + to.w, fwd = to.l > from.l, d = fwd ? 1 : -1;
-    const k = (l, r, t, h) => ({ left: l + 'px', width: r - l + 'px', top: t + 'px', height: h + 'px' });
-    // если в системе включено «уменьшить движение» — просто короткий переезд без капли
-    if (calm.matches) { pill.animate([k(from.l, from.l + from.w, from.t, from.h), k(to.l, tr, to.t, to.h)], { duration: 180, easing: 'ease-out' }); return; }
-    const mt = (from.t + to.t) / 2;
-    // 1) передний край рвётся к цели, задний держится — капля вытягивается и худеет
-    // 2) задний край догоняет, передний чуть перелетает  3) капля оседает на место
+    pill.getAnimations().forEach((x) => x.cancel());
+    goo.querySelectorAll('.drop').forEach((x) => x.remove());
+    if (calm.matches) { pill.animate([box(from.l, from.t, from.w, from.h), box(to.l, to.t, to.w, to.h)], { duration: 180, easing: 'ease-out' }); return; }
+    const H = to.h, R = H / 2, fwd = to.l > from.l || (to.l === from.l && to.t > from.t);
+    const ex = fwd ? from.l + from.w - R : from.l + R, ey = from.t + R;   // откуда выливается
+    const nx = fwd ? to.l + R : to.l + to.w - R, ny = to.t + R;           // куда втекает
+    const cx = to.l + to.w / 2, cy = to.t + R, D = 720;
+    // пока жидкость в пути, подписи серые; надпись темнеет, когда таблетка налилась
+    seg.classList.add('pouring'); clearTimeout(seg._pour); seg._pour = setTimeout(() => seg.classList.remove('pouring'), D * 0.6);
+    const drop = () => { const d = document.createElement('span'); d.className = 'drop'; goo.append(d); return d; };
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const bye = (x) => x.finished.then(() => x.effect.target.remove(), () => {});
+    // 1) старая таблетка стягивается к выходу в каплю и уходит за струёй
+    bye(drop().animate([
+      box(from.l, from.t, from.w, from.h),
+      { ...dot(ex, ey, R * 0.95), offset: 0.3, easing: 'cubic-bezier(.4,0,.6,1)' },
+      { ...dot(lerp(ex, nx, 0.3), lerp(ey, ny, 0.3), R * 0.55), offset: 0.55 },
+      dot(lerp(ex, nx, 0.55), lerp(ey, ny, 0.55), 0),
+    ], { duration: D * 0.75, easing: 'cubic-bezier(.5,0,.5,1)', fill: 'both' }));
+    // 2) струя: капли бегут от выхода к новому месту, по пути слипаются и чуть волнуются
+    [0.08, 0.18, 0.28, 0.38].forEach((t0, i) => {
+      const w = (i % 2 ? 1 : -1) * R * 0.22;
+      bye(drop().animate([
+        dot(ex, ey, 0),
+        { ...dot(lerp(ex, nx, 0.15), ey + w * 0.5, R * 0.62), offset: 0.2 },
+        { ...dot(lerp(ex, nx, 0.55), lerp(ey, ny, 0.55) - w, R * 0.7), offset: 0.55 },
+        { ...dot(nx, ny, R * 0.5), offset: 0.9 },
+        dot(nx, ny, R * 0.3),
+      ], { duration: D * 0.45, delay: D * t0, easing: 'cubic-bezier(.45,0,.4,1)', fill: 'both' }));
+    });
+    // 3) на новом месте — водоворот: две капли кружат вокруг центра по сужающейся спирали
+    [0, Math.PI].forEach((ph) => {
+      const fr = [];
+      for (let i = 0; i <= 10; i++) {
+        const t = i / 10, ang = ph + (fwd ? -1 : 1) * t * Math.PI * 3;
+        fr.push(dot(cx + Math.cos(ang) * (to.w / 2 - R * 0.6) * (1 - t), cy + Math.sin(ang) * R * 0.45 * (1 - t), R * (0.15 + 0.5 * Math.sin(Math.PI * Math.min(1, t * 1.2)))));
+      }
+      bye(drop().animate(fr, { duration: D * 0.5, delay: D * 0.32, easing: 'cubic-bezier(.3,0,.4,1)', fill: 'both' }));
+    });
+    // 4) сама таблетка наливается от места втекания до полной, с маленьким перелётом
     pill.animate([
-      k(from.l, fr, from.t, from.h),
-      { ...k(fwd ? from.l : to.l + 2, fwd ? tr - 2 : fr, mt + to.h * 0.12, to.h * 0.76), offset: 0.38, easing: 'cubic-bezier(.5,0,.3,1)' },
-      { ...k(to.l + d * 5, tr + d * 5, to.t + to.h * 0.04, to.h * 0.92), offset: 0.72, easing: 'cubic-bezier(.3,0,.3,1)' },
-      k(to.l, tr, to.t, to.h),
-    ], { duration: 460, easing: 'cubic-bezier(.4,0,.2,1)' });
+      dot(nx, ny, 0),
+      { ...dot(nx, ny, 0), offset: 0.3 },
+      { ...dot(nx, ny, R * 0.8), offset: 0.48 },
+      { ...box(fwd ? to.l : to.l + to.w * 0.4, to.t + H * 0.06, to.w * 0.6, H * 0.88), offset: 0.7 },
+      { ...box(to.l - 3, to.t - 1, to.w + 6, H + 2), offset: 0.86 },
+      box(to.l, to.t, to.w, to.h),
+    ], { duration: D, easing: 'cubic-bezier(.4,0,.3,1)' });
   });
 }
-addEventListener('resize', () => { pillAt.clear(); pills(); });
+addEventListener('resize', () => { pillAt.clear(); cardTall.clear(); pills(); });
 // линия под шапкой — только когда под неё уже уехало содержимое
 addEventListener('scroll', () => document.querySelectorAll('.bar').forEach((b) => b.classList.toggle('stuck', b.offsetParent && b.getBoundingClientRect().top <= 0 && scrollY > 0)), { passive: true });
 // при броске блоки не сжимаются: высота только растёт, чтобы страница под ними не прыгала; сброс при смене ширины
@@ -809,6 +857,8 @@ function render(flash = []) {
     <p class="ttl" data-f="t">${esc(e.t)}</p><p class="ask" data-f="d">${esc(e.d)}</p>
     <div class="badges">${st.egg.custom ? '<span class="badge">своё</span>' : ''}</div>${atSel('egg', st.egg.at)}</article>`);
   board.insertAdjacentHTML('beforeend', html.join(''));
+  // карточка не становится ниже, чем уже была на этом месте: схема не дёргается при смене текста
+  board.querySelectorAll('.card').forEach((el) => { const h = el.offsetHeight, was = cardTall.get(el.id) || 0; if (h > was) cardTall.set(el.id, h); el.style.minHeight = Math.max(h, was) + 'px'; });
   for (const id of flash) { const el = document.getElementById(id); if (el) { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); } }
   // пульт
   const allLocked = st.steps.every((s) => s.lock) && st.act.lock && st.choice.lock && st.egg.lock && Object.values(M()).every((m) => m.lock);
@@ -1030,9 +1080,14 @@ $('#fav').addEventListener('click', () => {
   favs.unshift({ title: `${SKELETONS[st.skel].name}: ${stepText(0).t} → ${stepText(3).t}`, text: asText(), state: clone(st) });
   favs = favs.slice(0, 50); store.set('favs', favs); renderFavs(); toast('В избранном');
 });
+// избранное общее: побочный квест сохраняется туда же, открывается на своей вкладке
+$('#favQuest').addEventListener('click', () => {
+  favs.unshift({ title: `Побочный квест: ${qWord('type')[0]} · ${qWord('giver')[0]} · ${qWord('twist')[0]}`, text: '# Побочный квест\n\n' + questText(), quest: clone(st.quest) });
+  favs = favs.slice(0, 50); store.set('favs', favs); renderFavs(); toast('В избранном');
+});
 $('#favList').addEventListener('click', (e) => {
   const o = e.target.closest('[data-fopen]'), c = e.target.closest('[data-fcopy]'), d = e.target.closest('[data-fdel]');
-  if (o) { const f = favs[+o.dataset.fopen]; commit(() => { st = clone(f.state); }); scrollTo({ top: 0, behavior: 'smooth' }); }
+  if (o) { const f = favs[+o.dataset.fopen]; if (f.quest) { commit(() => { st.quest = clone(f.quest); }); showTab('side'); } else { commit(() => { st = clone(f.state); }); showTab('main'); } scrollTo({ top: 0, behavior: 'smooth' }); }
   if (c) copyText(favs[+c.dataset.fcopy].text);
   if (d) { favs.splice(+d.dataset.fdel, 1); store.set('favs', favs); renderFavs(); }
 });
