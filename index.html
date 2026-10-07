@@ -777,7 +777,7 @@ const SVG = {
 const icons = (id, o, editable = true) => `<span class="ic">
   <button data-roll="${id}" aria-label="Другой вариант. Удержи, чтобы выбрать из списка" title="Другой вариант. Удержи — выбрать из списка">${SVG.die}</button>
   <button data-lock="${id}" aria-pressed="${o.lock}" aria-label="${o.lock ? 'Открепить' : 'Закрепить'}" title="${o.lock ? 'Закреплено: не изменится при броске. Нажми, чтобы открепить' : 'Закрепить: не изменится при броске'}">${o.lock ? SVG.lock : SVG.open}</button>
-  ${editable ? `<button data-edit="${id}" aria-label="Написать своё" title="Написать своё">${SVG.pen}</button>` : ''}</span>`;
+</span>`;
 const atSel = (id, at) => `<label class="at" for="at-${id}" title="К какому шагу сюжета относится карточка">на шаге <select id="at-${id}" data-at="${id}">${[1, 2, 3, 4].map((n) => `<option ${n === at ? 'selected' : ''}>${n}</option>`).join('')}</select></label>`;
 
 // переключатели: белая таблетка — жидкость. Слой с таблеткой прогнан через SVG-фильтр «goo»:
@@ -1015,6 +1015,8 @@ function toast(msg) {
   t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 1800);
 }
 let editing = null;
+// своё на карточке: двойной клик по тексту карточки сюжета, действия, выбора или секрета
+$('#board').addEventListener('dblclick', (e) => { const c = e.target.closest('.card'); if (c && !e.target.closest('button, select') && editing !== c.id) { window.getSelection()?.removeAllRanges(); startEdit(c.id); } });
 function startEdit(id) {
   if (editing) finishEdit(); // правил другую карточку — сохранить её
   const card = document.getElementById(id);
