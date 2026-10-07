@@ -48,6 +48,9 @@ button, select { font: inherit; color: inherit; }
 /* мотив */
 .sec { font-size: 15px; font-weight: 800; margin: 6px 0 -8px; padding-left: 4px; }
 .sec span { color: var(--muted); font-weight: 600; }
+.sech { display: flex; align-items: center; gap: 8px; margin: 6px 0 -8px; }
+.sech .sec { margin: 0; }
+.sech .ic button { background: var(--t0); }
 .motive { background: var(--t0); border-radius: 26px; padding: 18px; display: grid; gap: 12px; --a: var(--a0); --t: var(--t0); }
 .mrow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .mpart { background: var(--surface); border-radius: 18px; padding: 8px 8px 10px 12px; display: grid; gap: 2px; align-content: start; min-width: 0; }
@@ -154,7 +157,7 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
     <h1 title="Генератор идей для квестов: бросаешь кости — получаешь завязку, ход сюжета, выбор игрока и секрет">Кости сюжета</h1>
   </div>
 
-  <h2 class="sec" title="Чего хочет герой и что ему мешает. Из этого собирается идея квеста">Завязка</h2>
+  <div class="sech"><h2 class="sec" title="Чего хочет герой и что ему мешает. Из этого собирается идея квеста">Завязка</h2><span class="ic"><button data-roll="motive" aria-label="Другая завязка целиком. Удержи, чтобы выбрать из списка" title="Другая завязка целиком. Удержи — выбрать из списка"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="3.5"/><circle cx="7.2" cy="7.2" r="1.2" class="f"/><circle cx="10" cy="10" r="1.2" class="f"/><circle cx="12.8" cy="12.8" r="1.2" class="f"/></svg></button></span></div>
   <section class="motive" id="motive" aria-label="Завязка"></section>
 
   <div class="panel">
@@ -399,12 +402,15 @@ function rollStep(k, flash) {
   if (!o.lock) { o.p = s.p; o.custom = null; flash.push('s' + PARTNER[k]); }
   flash.push('s' + k);
 }
+function rollMotive() {
+  const free = Object.keys(st.motive).filter((k) => !st.motive[k].lock);
+  if (free.length) { const b = ri(BUNDLES.length, st.motive[free[0]].i); for (const k of free) st.motive[k].i = b; }
+}
 function rollAll() {
   const flash = [];
   commit(() => {
     const S = SKELETONS[st.skel];
-    const free = Object.keys(st.motive).filter((k) => !st.motive[k].lock);
-    if (free.length) { const b = ri(BUNDLES.length, st.motive[free[0]].i); for (const k of free) st.motive[k].i = b; }
+    rollMotive();
     for (const pair of [[0, 3], [1, 2]]) {
       const [a, b] = pair, A = st.steps[a], B = st.steps[b];
       if (A.lock && B.lock) continue;
@@ -422,7 +428,8 @@ function rollAll() {
 function rollOne(id) {
   const flash = [];
   commit(() => {
-    if (id.startsWith('s')) rollStep(+id[1], flash);
+    if (id === 'motive') rollMotive();
+    else if (id.startsWith('s')) rollStep(+id[1], flash);
     else if (id === 'act') { st.act.i = ri(PACKS[st.pack].items.length, st.act.i); st.act.custom = null; flash.push('act'); }
     else if (id === 'choice') { st.choice.i = ri(CHOICES.length, st.choice.i); st.choice.custom = null; flash.push('choice'); }
     else if (id === 'egg') { st.egg.i = ri(SECRETS.length, st.egg.i); st.egg.custom = null; flash.push('egg'); }
@@ -431,6 +438,7 @@ function rollOne(id) {
 }
 // ===================== СПИСОК ВАРИАНТОВ (удержать кубик) =====================
 function variants(id) {
+  if (id === 'motive') return { cur: st.motive.want.i, list: BUNDLES.map((b) => b[0][0].toUpperCase() + b[0].slice(1)) };
   if (id.startsWith('s')) { const k = +id[1]; return { cur: st.steps[k].p, list: SKELETONS[st.skel][groupOf(k)].map((pr) => pr[k < 2 ? 0 : 1][0]) }; }
   if (id.startsWith('m-')) { const k = id.slice(2); return { cur: st.motive[k].i, list: MOTIVE[k].items }; }
   if (id === 'act') return { cur: st.act.i, list: PACKS[st.pack].items.map((x) => x[0]) };
@@ -440,7 +448,8 @@ function variants(id) {
 function pickVariant(id, i) {
   const flash = [];
   commit(() => {
-    if (id.startsWith('s')) {
+    if (id === 'motive') { for (const k of Object.keys(st.motive)) if (!st.motive[k].lock) st.motive[k].i = i; }
+    else if (id.startsWith('s')) {
       const k = +id[1], s = st.steps[k], o = st.steps[PARTNER[k]];
       s.p = i; s.custom = null; flash.push(id);
       if (!o.lock) { o.p = i; o.custom = null; flash.push('s' + PARTNER[k]); }
