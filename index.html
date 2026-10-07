@@ -81,6 +81,8 @@ button, select { font: inherit; color: inherit; }
 #quest .idea { font-size: clamp(16px, 2vw, 19px); }
 .mpart.roles .mhead { min-height: 28px; }
 .idea { font-size: clamp(18px, 2.4vw, 22px); font-weight: 700; line-height: 1.35; text-wrap: balance; margin: 0; padding-inline: 4px; }
+/* фраза завязки: место сразу под три строки и отступ снизу — «Сюжет» ниже не прыгает, когда фраза короче или длиннее */
+#idea { min-height: calc(3 * 1.35em); margin-bottom: 10px; }
 @media (max-width: 760px) { .mrow, .mrow.three { grid-template-columns: 1fr 1fr; } .mrow.three .roles { grid-column: 1 / -1; } }
 @media (max-width: 760px) { .mrow.six { grid-template-columns: 1fr; } }
 
