@@ -53,9 +53,7 @@ button, select { font: inherit; color: inherit; }
 .mpart { background: var(--surface); border-radius: 18px; padding: 8px 8px 10px 12px; display: grid; gap: 2px; align-content: start; min-width: 0; }
 .mhead { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
 .mpart .ic button { background: var(--t0); }
-.mpart small { font-size: 12px; font-weight: 700; color: var(--a0); display: block; }
-.ml { display: grid; line-height: 1.2; min-width: 0; }
-.ml i { font-style: normal; font-size: 11px; color: var(--muted); }
+.mpart small { font-size: 12px; font-weight: 700; color: var(--a0); cursor: help; }
 .mpart b { font-size: 16px; line-height: 1.25; overflow-wrap: anywhere; }
 .idea { font-size: clamp(18px, 2.4vw, 22px); font-weight: 700; line-height: 1.35; text-wrap: balance; }
 @media (max-width: 760px) { .mrow { grid-template-columns: 1fr 1fr; } }
@@ -502,7 +500,7 @@ const atSel = (id, at) => `<label class="at" for="at-${id}" title="К каком
 function render(flash = []) {
   const S = SKELETONS[st.skel];
   // мотив
-  $('#motive').innerHTML = `<div class="mrow">${Object.keys(MOTIVE).map((k) => `<div class="mpart"><div class="mhead"><span class="ml"><small>${MOTIVE[k].label}</small><i>${MOTIVE[k].hint}</i></span>${icons('m-' + k, st.motive[k], false)}</div><b>${esc(mWord(k))}</b></div>`).join('')}</div>
+  $('#motive').innerHTML = `<div class="mrow">${Object.keys(MOTIVE).map((k) => `<div class="mpart"><div class="mhead"><small title="${MOTIVE[k].hint[0].toUpperCase() + MOTIVE[k].hint.slice(1)}">${MOTIVE[k].label}</small>${icons('m-' + k, st.motive[k], false)}</div><b>${esc(mWord(k))}</b></div>`).join('')}</div>
     <p class="idea">${esc(ideaText())}</p>`;
   // скелеты и наборы
   $('#skels').innerHTML = Object.entries(SKELETONS).map(([k, s]) => `<button data-skel="${k}" aria-pressed="${k === st.skel}" title="${esc(s.tip)}">${esc(s.name)}</button>`).join('');
