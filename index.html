@@ -118,6 +118,8 @@ button, select { font: inherit; color: inherit; }
 /* шапка с костями прилипает к верху экрана и тянется от края до края окна, фон сплошной */
 .bar { position: sticky; top: 0; z-index: 30; margin-inline: calc(50% - 50vw); padding: 10px calc(50vw - 50%); background: var(--bg); }
 body { overflow-x: clip; }
+/* айфон: над прилипшей шапкой (под строкой состояния и адресом) не должно просвечивать содержимое — закрываем фоном */
+.bar.stuck::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 240px; background: var(--bg); pointer-events: none; }
 .seg { position: relative; isolation: isolate; display: inline-flex; background: var(--surface); border: 0; border-radius: 999px; padding: 0; flex-wrap: wrap; }
 .seg.pouring button { color: var(--muted); }
 .seg .goo { position: absolute; inset: 0; z-index: -1; pointer-events: none; filter: url(#goo); border-radius: inherit; overflow: hidden; transform: translateZ(0); }
@@ -862,6 +864,9 @@ function pills() {
   });
 }
 addEventListener('resize', () => { pillAt.clear(); cardTall.clear(); pills(); });
+const headBar = $('#head');
+const stick = () => headBar.classList.toggle('stuck', headBar.getBoundingClientRect().top <= 1 && scrollY > 0);
+addEventListener('scroll', stick, { passive: true }); stick();
 // при броске блоки не сжимаются: высота только растёт, чтобы страница под ними не прыгала; сброс при смене ширины
 const tall = ['#motive', '#idea', '#board', '#story', '#quest'];
 function steady() { for (const q of tall) { const e = $(q); if (!e || !e.offsetParent) continue; e.style.minHeight = ''; } requestAnimationFrame(() => { for (const q of tall) { const e = $(q); if (!e || !e.offsetParent) continue; const h = e.getBoundingClientRect().height, was = +e.dataset.tall || 0; if (h > was) e.dataset.tall = h; e.style.minHeight = Math.max(h, was) + 'px'; } }); }
