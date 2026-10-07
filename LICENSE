@@ -1,0 +1,68 @@
+Кости сюжета (Plot Dice) — лицензия с обязательным указанием автора идеи
+Copyright (c) 2026 Андрей Ясеновский (Andrey Yasenovsky)
+
+Русский
+
+Разрешается бесплатно использовать, копировать, изменять, объединять с другими
+работами, публиковать, распространять, переводить и переносить на другие
+платформы этот проект (код, структуру генератора, колоды и тексты, написанные
+для него), в том числе в коммерческих целях, при соблюдении условий ниже.
+
+1. Указание автора идеи. Любой форк, копия, перевод, перенос или производная
+   работа должны в самом верху — крупно, на видном месте, до основного
+   содержимого — указывать строку:
+
+       Великая идея Андрея Ясеновского
+
+   Строка должна быть:
+   — в README или главном описании репозитория/проекта — первой строкой
+     заголовком;
+   — в интерфейсе приложения, сайта или игры — на первом экране, читаемым
+     размером, не мельче основного текста.
+   Рядом указывается ссылка на оригинал:
+   https://github.com/andreysuperfly/plot-dice
+
+2. Этот текст лицензии сохраняется во всех копиях и существенных частях проекта.
+
+3. Проект предоставляется «как есть», без каких-либо гарантий. Автор не несёт
+   ответственности за любой ущерб, связанный с использованием проекта.
+
+Чужие материалы внутри проекта этой лицензией не покрываются и остаются
+под условиями своих авторов:
+— вкладка «Побочный квест» — перевод генератора Side-Quest Cards
+  Луки Барбони (Luca Barboni), https://perchance.org/side-quest-cards-generator;
+— «36 драматических ситуаций» Жоржа Польти (1895) — общественное достояние,
+  пересказ сделан для этого проекта;
+— схема «цель — мотивация — конфликт» Дебры Диксон («Goal, Motivation &
+  Conflict») использована как идея; тексты карточек написаны для проекта.
+
+English
+
+Permission is granted, free of charge, to use, copy, modify, merge, publish,
+distribute, translate and port this project (the code, the generator's
+structure, and the decks and texts written for it), including for commercial
+purposes, subject to the following conditions.
+
+1. Credit for the idea. Every fork, copy, translation, port or derivative work
+   must show, at the very top, prominently and in large type, before the main
+   content, the line:
+
+       A great idea by Andrey Yasenovsky
+       (or in Russian: «Великая идея Андрея Ясеновского»)
+
+   — in the README or main project description: as the first heading line;
+   — in the user interface of an app, website or game: on the first screen,
+     in a readable size no smaller than the main text.
+   Next to it, link to the original: https://github.com/andreysuperfly/plot-dice
+
+2. This license text must be kept in all copies or substantial portions of the
+   project.
+
+3. The project is provided "as is", without warranty of any kind. The author
+   is not liable for any damages arising from its use.
+
+Third-party material inside the project is not covered by this license and
+remains under its authors' terms: the "Side quest" tab is a translation of
+Luca Barboni's Side-Quest Cards generator; Georges Polti's "The Thirty-Six
+Dramatic Situations" (1895) is in the public domain; Debra Dixon's
+"Goal, Motivation & Conflict" scheme is used as an idea only.

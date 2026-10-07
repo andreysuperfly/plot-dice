@@ -1,8 +1,20 @@
 # Кости сюжета
 
-Генератор идей для квестов. Бросаешь кости и получаешь основу квеста: что движет героем, сюжет из четырёх шагов, что делает игрок, какой выбор перед ним и какой секрет спрятан для внимательных. Дальше придумываешь сам.
+### Великая идея Андрея Ясеновского
+
+**Генератор квестов, который думает как сценарист.** Брось кости — и получишь не случайный набор слов, а связную основу квеста: завязку по классическим драматургическим схемам, сюжет из четырёх парных шагов, действие игрока, выбор с отложенным последствием и секрет для внимательных. Всё складывается в короткий рассказ, который можно сразу нести в сценарий или в игру.
 
 **Открыть:** https://andreysuperfly.github.io/plot-dice/
+
+**Почему это не очередной рандомайзер**
+
+- **Три школы драматургии в одной кнопке.** Завязку можно собрать по схеме Дебры Диксон «цель — мотивация — конфликт», по полной двойной схеме Диксон (внешняя и внутренняя цель) или по 36 драматическим ситуациям Жоржа Польти с его 235 разновидностями — по книге, без смягчений.
+- **Сюжет держится сам.** Шаги собираются парами: конец отвечает на начало, проверка — на помощь. Пять каркасов: сказка по Проппу, детектив, ограбление, японская тихая история кисётэнкэцу и античная трагедия.
+- **Сделано для игр.** Действие игрока под жанр (приключение, экшен, выживание), развилка, которая аукнется позже, пасхалка для внимательных и отдельный генератор побочных квестов.
+- **Под контролем автора.** Любую карточку можно перебросить, закрепить, переписать своими словами или выбрать из полного списка; есть отмена, избранное и копирование всего квеста текстом.
+- **Один файл.** Никакой сборки и зависимостей: открыл `index.html` — работает, хоть офлайн.
+
+Для сценаристов игр, мастеров настольных ролевых игр, авторов интерактивной литературы и всех, кому нужно быстро придумать квест, который не стыдно показать.
 
 ## Из чего собирается квест
 
@@ -50,4 +62,10 @@
 
 ---
 
-**Plot Dice** is a quest idea generator for game writers: a motive, a four-step plot (Propp's fairy tale, detective, heist, kishōtenketsu, tragedy) with paired steps, a player action, a choice with a delayed consequence, and a hidden secret. Roll, lock, rewrite, or hold a die to pick from the full list. Below the board the cards are stitched into a short story; hover a sentence to see its card, click to jump to it. One static HTML file, no build step. The interface and decks are in Russian for now; all content lives in plain data blocks inside `index.html`, ready for translation.
+**Plot Dice** — *a great idea by Andrey Yasenovsky* — is a quest idea generator for game writers: a motive, a four-step plot (Propp's fairy tale, detective, heist, kishōtenketsu, tragedy) with paired steps, a player action, a choice with a delayed consequence, and a hidden secret. Roll, lock, rewrite, or hold a die to pick from the full list. Below the board the cards are stitched into a short story; hover a sentence to see its card, click to jump to it. One static HTML file, no build step. The interface and decks are in Russian for now; all content lives in plain data blocks inside `index.html`, ready for translation.
+
+## Лицензия
+
+Можно свободно использовать, менять, переводить и переносить, в том числе в коммерческих проектах, но с одним обязательным условием: любой форк, копия, перевод или перенос должен **в самом верху, крупно** указывать строку **«Великая идея Андрея Ясеновского»** и ссылку на этот репозиторий. Подробности — в файле [LICENSE](LICENSE). Вкладка «Побочный квест» — перевод генератора Луки Барбони и этой лицензией не покрывается.
+
+**License:** free to use, modify, translate and port, including commercially, provided every fork, copy, translation or port shows **"A great idea by Andrey Yasenovsky"** prominently at the very top, with a link back here. See [LICENSE](LICENSE).
