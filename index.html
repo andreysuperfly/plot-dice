@@ -100,7 +100,6 @@ button, select { font: inherit; color: inherit; }
 @media (max-width: 760px) { .mrow.polti { grid-template-columns: 1fr 1fr; min-height: 0; } .mrow.polti .roles { grid-column: 1 / -1; } }
 .mpart { background: var(--surface); border-radius: 18px; padding: 8px 8px 10px 12px; display: grid; gap: 2px; align-content: start; min-width: 0; }
 .mhead { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-.mpart .ic button { background: var(--t0); }
 .mpart small { font-size: 12px; font-weight: 700; color: var(--a0); cursor: help; }
 .mhead small { min-width: 0; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: anywhere; }
 .mpart b { font-size: 16px; line-height: 1.25; overflow-wrap: anywhere; }
@@ -176,11 +175,12 @@ body { overflow-x: clip; }
 .n { width: 26px; height: 26px; border-radius: 50%; background: var(--a); color: var(--surface); display: grid; place-items: center; font-weight: 800; font-size: 13px; flex: none; }
 .ic { display: inline-flex; gap: 2px; }
 .ic { flex: none; }
-.ic button { border: 0; background: var(--surface); color: var(--ink); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: grid; place-items: center; padding: 0; }
+/* кнопки на карточках — просто иконки без кружков: серые, при наведении светлеют, включённый замок — цветом карточки */
+.ic button { border: 0; background: transparent; color: var(--muted); width: 28px; height: 28px; border-radius: 8px; transition: color .15s; cursor: pointer; display: grid; place-items: center; padding: 0; }
 .ic svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
 .ic svg .f { fill: currentColor; stroke: none; }
-.ic button:hover { box-shadow: inset 0 0 0 2px var(--a, var(--a0)); }
-.ic button[aria-pressed="true"] { background: var(--a, var(--a0)); color: var(--surface); }
+.ic button:hover { color: var(--ink); }
+.ic button[aria-pressed="true"] { color: var(--a, var(--a0)); }
 .card small { font-size: 12px; color: var(--a); font-weight: 700; }
 .ttl { font-size: 17px; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; }
 .c-choice .ttl, .c-act .ttl, .c-egg .ttl { font-size: 19px; }
