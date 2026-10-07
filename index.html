@@ -63,6 +63,10 @@ button, select { font: inherit; color: inherit; }
 .sech .ic svg { width: 20px; height: 20px; }
 .sech .ic svg rect { fill: var(--bg); stroke: none; }
 .sech .ic svg .f { fill: var(--ink); }
+.sech .ic button:hover { box-shadow: none; }
+.sech .ic button:active, .btn.dice:active { transform: scale(.94); }
+.sech .ic button.rolling svg { animation: roll .4s ease; }
+.btn.dice:focus-visible, .sech .ic button:focus-visible { outline: 2px solid var(--muted); outline-offset: 2px; }
 .motive { background: var(--t0); border-radius: 26px; padding: 18px; display: grid; gap: 12px; --a: var(--a0); --t: var(--t0); }
 .mrow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .mrow.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -104,7 +108,6 @@ body { overflow-x: clip; }
 .btn.dice circle { fill: var(--ink); }
 .btn.dice.rolling svg { animation: roll .45s ease; }
 @keyframes roll { 0% { transform: rotate(0); } 40% { transform: rotate(-14deg) scale(1.08); } 100% { transform: rotate(0); } }
-@media (prefers-reduced-motion: reduce) { .btn.dice.rolling svg { animation: none; } }
 .story { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 18px 20px; display: grid; gap: 12px; font-size: 17px; line-height: 1.65; max-width: 100%; }
 .story p { margin: 0; max-width: 70ch; }
 .story .syn { font-weight: 700; }
@@ -566,6 +569,7 @@ function fitVariant(fresh) {
   if (P.v.i >= n) P.v.i = ri(n);
 }
 function rollAll() {
+  spin($('#rollAll'));
   const flash = [];
   commit(() => {
     const S = SKELETONS[st.skel];
@@ -583,7 +587,23 @@ function rollAll() {
   }, flash);
 }
 function rollQuest() { for (const k of Object.keys(SIDE)) if (!st.quest[k].lock) st.quest[k].i = ri(SIDE[k].items.length, st.quest[k].i); }
+// кубики на кнопках: при броске грани быстро перещёлкиваются (3–4 случайных числа) и встают на новое
+const PIPS = { 1: [[1, 1]], 2: [[0, 0], [2, 2]], 3: [[0, 0], [1, 1], [2, 2]], 4: [[0, 0], [2, 0], [0, 2], [2, 2]], 5: [[0, 0], [2, 0], [1, 1], [0, 2], [2, 2]], 6: [[0, 0], [2, 0], [0, 1], [2, 1], [0, 2], [2, 2]] };
+function face(rect, n) {
+  const x = +rect.getAttribute('x'), y = +rect.getAttribute('y'), w = +rect.getAttribute('width'), r = w * 0.093, cls = rect.closest('.ic') ? ' class="f"' : '';
+  rect.parentNode.querySelectorAll('circle').forEach((c) => c.remove());
+  rect.insertAdjacentHTML('afterend', PIPS[n].map(([i, j]) => `<circle cx="${x + w * (0.27 + 0.23 * i)}" cy="${y + w * (0.27 + 0.23 * j)}" r="${r}"${cls}/>`).join(''));
+}
+function spin(btn) {
+  if (!btn) return;
+  const rects = [...btn.querySelectorAll('svg rect')];
+  btn.classList.remove('rolling'); void btn.offsetWidth; btn.classList.add('rolling');
+  clearInterval(btn._spin); let n = 0;
+  const tick = () => { rects.forEach((r) => face(r, 1 + ri(6))); if (++n > 4) clearInterval(btn._spin); };
+  tick(); btn._spin = setInterval(tick, 70);
+}
 function rollOne(id) {
+  if (id === 'motive') spin($('[data-roll="motive"]')); else if (id === 'quest') spin($('#rollQuest'));
   const flash = [];
   commit(() => {
     if (id === 'quest') rollQuest();
@@ -1011,7 +1031,7 @@ document.addEventListener('change', (e) => {
   if (editing) finishEdit();
   if (s.dataset.at) { const id = s.dataset.at; commit(() => { st[id].at = +s.value; }, [id]); }
 });
-$('#rollAll').addEventListener('click', () => { const b = $('#rollAll'); b.classList.remove('rolling'); void b.offsetWidth; b.classList.add('rolling'); rollAll(); });
+$('#rollAll').addEventListener('click', () => rollAll());
 function doUndo() { if (!undo.length) return; redo.push(clone(st)); st = undo.pop(); store.set('state', st); render(); }
 function doRedo() { if (!redo.length) return; undo.push(clone(st)); st = redo.pop(); store.set('state', st); render(); }
 $('#undo').addEventListener('click', doUndo);
@@ -1025,7 +1045,7 @@ function showTab(t) {
   pills(); steady();
 }
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
-$('#rollQuest').addEventListener('click', () => { const b = $('#rollQuest'); b.classList.remove('rolling'); void b.offsetWidth; b.classList.add('rolling'); rollOne('quest'); });
+$('#rollQuest').addEventListener('click', () => rollOne('quest'));
 $('#copyQuest').addEventListener('click', () => copyText('# Побочный квест\n\n' + questText()));
 showTab(tab);
 $('#redo').addEventListener('click', doRedo);
