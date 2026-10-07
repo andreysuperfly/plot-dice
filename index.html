@@ -36,6 +36,10 @@ html, body { margin: 0; }
 body { background: var(--bg); color: var(--ink); font-family: var(--f-ui); line-height: 1.5; }
 p, h1, h2, h3 { margin: 0; }
 button, select { font: inherit; color: inherit; }
+.view { display: grid; gap: 18px; min-width: 0; }
+.view[hidden] { display: none !important; }
+.tabs { justify-self: start; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
 .page { max-width: 1100px; margin: 0 auto; padding-inline: 18px; padding-block: 24px 64px; display: grid; gap: 18px; }
 :focus-visible { outline: 3px solid var(--a2); outline-offset: 2px; }
 
@@ -63,6 +67,8 @@ button, select { font: inherit; color: inherit; }
 .mpart .ic button { background: var(--t0); }
 .mpart small { font-size: 12px; font-weight: 700; color: var(--a0); cursor: help; }
 .mpart b { font-size: 16px; line-height: 1.25; overflow-wrap: anywhere; }
+.mpart .qd { font-size: 13px; color: var(--muted); line-height: 1.3; }
+#quest .idea { font-size: clamp(16px, 2vw, 19px); }
 .mpart.roles .mhead { min-height: 28px; }
 .idea { font-size: clamp(18px, 2.4vw, 22px); font-weight: 700; line-height: 1.35; text-wrap: balance; }
 @media (max-width: 760px) { .mrow, .mrow.three { grid-template-columns: 1fr 1fr; } .mrow.three .roles { grid-column: 1 / -1; } }
@@ -163,6 +169,11 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
   <div class="title">
     <h1 title="Генератор идей для квестов: бросаешь кости — получаешь завязку, ход сюжета, выбор игрока и секрет">Кости сюжета</h1>
   </div>
+  <div class="seg tabs" id="tabs" role="tablist" aria-label="Раздел">
+    <button role="tab" data-tab="main" aria-selected="true">Кости сюжета</button>
+    <button role="tab" data-tab="side" aria-selected="false" title="Отдельный генератор коротких побочных квестов по системе Side-Quest Cards Луки Барбони">Побочный квест</button>
+  </div>
+  <div class="view" id="vMain">
 
   <div class="sech"><h2 class="sec" title="Чего хочет герой и что ему мешает. Из этого собирается идея квеста">Завязка</h2><span class="ic"><button data-roll="motive" aria-label="Другая завязка" title="Другая завязка. В режиме «По Польти» удержи — выбрать ситуацию из 36"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="3.5"/><circle cx="7.2" cy="7.2" r="1.2" class="f"/><circle cx="10" cy="10" r="1.2" class="f"/><circle cx="12.8" cy="12.8" r="1.2" class="f"/></svg></button></span><div class="seg" id="zmodes" role="group" aria-label="Как строить завязку"></div></div>
   <section class="motive" id="motive" aria-label="Завязка"></section>
@@ -200,6 +211,15 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
     <p class="muted" id="favEmpty" title="Избранное хранится только в этом браузере">Пока пусто.</p>
     <ol id="favList"></ol>
   </section>
+  </div>
+  <div class="view" id="vSide" hidden>
+    <p class="muted">Короткий побочный квест: шесть колод по шесть карточек, как на кубике d6. По системе <a href="https://perchance.org/side-quest-cards-generator" target="_blank" rel="noopener">Side-Quest Cards</a> Луки Барбони, пересказ на русском.</p>
+    <div class="panel">
+      <button class="btn dice" id="rollQuest" aria-label="Бросить побочный квест" title="Бросить побочный квест. Клавиша: пробел"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
+      <button class="ghost" id="copyQuest" title="Побочный квест обычным текстом">Скопировать</button>
+    </div>
+    <section class="motive" id="quest" aria-label="Побочный квест"></section>
+  </div>
 </div>
 
 <script>
@@ -369,6 +389,16 @@ const DIX2 = {
     { g: 'найти смысл', m: ['всё, во что он верил, оказалось ложью', 'он пережил тех, ради кого жил', 'он устал жить по чужим правилам'], c: ['он больше ни во что не верит', 'смысл может оказаться в том, от чего он бежит', 'поиски смысла мешают делу'] },
   ],
 };
+// Побочный квест: система Side-Quest Cards Луки Барбони (perchance.org/side-quest-cards-generator), пересказ на русском.
+// Шесть колод по шесть карточек — под обычный кубик d6. [название, пояснение]
+const SIDE = {
+  type:   { label: 'Что сделать', items: [['Принести', 'достать что-то и доставить'], ['Устранить', 'убрать кого-то или что-то'], ['Сопроводить', 'довести кого-то или что-то из точки А в точку Б'], ['Включить или выключить', 'запустить или остановить что-то в нужном месте'], ['Раскрыть тайну', 'найти ответ на нераскрытую загадку'], ['Разузнать', 'собрать важные сведения']] },
+  giver:  { label: 'Кто даёт', items: [['Торговец', 'квест даёт торговец'], ['Преступник', 'квест даёт преступник'], ['Изгой', 'квест даёт тот, кто живёт вне общества'], ['Мудрец', 'квест даёт мудрец'], ['Страж порядка', 'квест даёт тот, кто охраняет закон'], ['Власть', 'квест даёт тот, кто здесь главный']] },
+  where:  { label: 'Где цель', items: [['В здании власти', 'цель в месте, где сидит сила'], ['В городе', 'цель где-то в городе'], ['В другом мире', 'цель на другой планете или в ином измерении'], ['В глуши', 'цель вдали от людей'], ['На острове', 'цель на острове'], ['Под землёй', 'цель под землёй']] },
+  reward: { label: 'Награда', items: [['Деньги и ценности', 'за квест платят'], ['Просто так правильно', 'награды нет, но иначе нельзя'], ['Услуга за услугу', 'квестодатель будет должен'], ['Тайна прошлого', 'герой узнаёт важное о своём прошлом'], ['Ключ к главному', 'герой узнаёт важное о главном сюжете'], ['Уважение', 'растёт репутация или положение']] },
+  help:   { label: 'Подмога', items: [['Сведения', 'квестодатель рассказывает о цели'], ['Ключ', 'квестодатель даёт ключ к цели'], ['Союзник', 'квестодатель даёт помощника'], ['Предмет', 'квестодатель даёт полезную вещь'], ['Быстрый путь', 'квестодатель даёт транспорт или короткую дорогу'], ['Карта', 'квестодатель даёт карту']] },
+  twist:  { label: 'Поворот', items: [['Заклятый враг', 'появляется старый или новый враг, связанный с главным сюжетом'], ['Предательство', 'союзник предаёт'], ['Всё наоборот', 'квестодатель оказывается злодеем, а враг — хорошим'], ['Отсчёт', 'оказывается, что времени мало'], ['Не по силам', 'противник слишком силён — может, лучше бежать'], ['Короткий путь', 'к цели есть дорога быстрее']] },
+};
 const ZDECKS = {
   classic: CLASSIC,
   dixon2: {
@@ -476,6 +506,10 @@ try {
   if (!(st.choice.i < CHOICES.length)) st.choice.i = 0;
   if (!(st.egg.i < SECRETS.length)) st.egg.i = 0;
 } catch { st = fresh(); }
+try {
+  if (!st.quest) st.quest = {};
+  for (const k of Object.keys(SIDE)) if (!st.quest[k] || !(st.quest[k].i < SIDE[k].items.length)) st.quest[k] = { i: ri(SIDE[k].items.length), lock: false };
+} catch { st.quest = {}; for (const k of Object.keys(SIDE)) st.quest[k] = { i: 0, lock: false }; }
 const undo = [], redo = [];
 
 function commit(mut, flash = []) {
@@ -525,10 +559,13 @@ function rollAll() {
     if (st.act.at > st.choice.at && !st.act.lock && !st.choice.lock) [st.act.at, st.choice.at] = [st.choice.at, st.act.at];
   }, flash);
 }
+function rollQuest() { for (const k of Object.keys(SIDE)) if (!st.quest[k].lock) st.quest[k].i = ri(SIDE[k].items.length, st.quest[k].i); }
 function rollOne(id) {
   const flash = [];
   commit(() => {
-    if (id === 'motive') rollMotive();
+    if (id === 'quest') rollQuest();
+    else if (id.startsWith('q-')) { const k = id.slice(2); st.quest[k].i = ri(SIDE[k].items.length, st.quest[k].i); }
+    else if (id === 'motive') rollMotive();
     else if (id.startsWith('s')) rollStep(+id[1], flash);
     else if (id === 'act') { st.act.i = ri(PACKS[st.pack].items.length, st.act.i); st.act.custom = null; flash.push('act'); }
     else if (id === 'choice') { st.choice.i = ri(CHOICES.length, st.choice.i); st.choice.custom = null; flash.push('choice'); }
@@ -564,6 +601,8 @@ for (const ev of ['pointerdown', 'scroll', 'keydown']) document.addEventListener
 
 // ===================== СПИСОК ВАРИАНТОВ (удержать кубик) =====================
 function variants(id) {
+  if (id === 'quest') return null;
+  if (id.startsWith('q-')) { const k = id.slice(2); return { cur: st.quest[k].i, list: SIDE[k].items.map(([t, d]) => `${t} — ${d}`) }; }
   if (id === 'motive') return st.zmode === 'polti' ? { cur: M().sit.i, list: POLTI.map((p, n) => `${n + 1}. ${p.n}`) } : null;
   if (id.startsWith('s')) { const k = +id[1]; return { cur: st.steps[k].p, list: SKELETONS[st.skel][groupOf(k)].map((pr) => pr[k < 2 ? 0 : 1][0]) }; }
   if (id.startsWith('m-')) { const k = id.slice(2); return { cur: M()[k].i, list: k === 'sit' ? POLTI.map((p, n) => `${n + 1}. ${p.n}`) : k === 'v' ? POLTI[M().sit.i].v.map(([c, t]) => `${c}: ${t}`) : items(k) }; }
@@ -574,7 +613,8 @@ function variants(id) {
 function pickVariant(id, i) {
   const flash = [];
   commit(() => {
-    if (id === 'motive') { M().sit.i = i; fitVariant(true); }
+    if (id.startsWith('q-')) st.quest[id.slice(2)].i = i;
+    else if (id === 'motive') { M().sit.i = i; fitVariant(true); }
     else if (id.startsWith('s')) {
       const k = +id[1], s = st.steps[k], o = st.steps[PARTNER[k]];
       s.p = i; s.custom = null; flash.push(id);
@@ -628,7 +668,7 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('resize', () => closePicker());
 document.addEventListener('scroll', (e) => { if (picker && !picker.el.contains(e.target)) closePicker(); }, true);
 
-const objOf = (id) => (id.startsWith('s') ? st.steps[+id[1]] : id.startsWith('m-') ? M()[id.slice(2)] : st[id]);
+const objOf = (id) => (id.startsWith('q-') ? st.quest[id.slice(2)] : id.startsWith('s') ? st.steps[+id[1]] : id.startsWith('m-') ? M()[id.slice(2)] : st[id]);
 
 // ===================== ТЕКСТЫ КАРТОЧЕК =====================
 function stepText(k) {
@@ -647,6 +687,10 @@ const ideaText = () => st.zmode === 'polti'
   : st.zmode === 'dixon2'
   ? `Герой хочет ${mWord('eg')}, потому что ${mWord('em')}, но ${mWord('ec')}. А в душе он хочет ${mWord('ig')}, потому что ${mWord('im')}, но ${mWord('ic')}.`
   : `Герой хочет ${mWord('want')}. Мешает ${mWord('block')}. Отступить нельзя: ${mWord('because')}. Если не выйдет, ${mWord('stake')}.`;
+
+const qWord = (k) => SIDE[k].items[st.quest[k].i];
+const questText = () => { const w = (k) => qWord(k)[0].toLowerCase(), d = (k) => qWord(k)[1];
+  return `${qWord('type')[0]}: ${d('type')}. Квест даёт ${w('giver')}, цель — ${w('where')}. Награда: ${w('reward')} (${d('reward')}). В дорогу: ${w('help')}. Поворот: ${d('twist')}.`; };
 
 // ===================== ОТРИСОВКА =====================
 const SVG = {
@@ -671,6 +715,9 @@ function render(flash = []) {
   if (st.zmode === 'polti') zcards.push(`<div class="mpart roles"><div class="mhead"><small title="Кто против кого. У Польти каждая ситуация — это набор ролей. Меняются вместе с ситуацией">Роли</small></div><b>${esc(POLTI[M().sit.i].r)}</b></div>`);
   $('#motive').innerHTML = `<div class="mrow${st.zmode !== 'classic' ? ' three' : ''}">${zcards.join('')}</div>
     <p class="idea">${esc(ideaText())}</p>`;
+  // побочный квест
+  $('#quest').innerHTML = `<div class="mrow three">${Object.keys(SIDE).map((k) => `<div class="mpart"><div class="mhead"><small>${SIDE[k].label}</small>${icons('q-' + k, st.quest[k], false)}</div><b>${esc(qWord(k)[0])}</b><span class="qd">${esc(qWord(k)[1])}</span></div>`).join('')}</div>
+    <p class="idea">${esc(questText())}</p>`;
   // скелеты и наборы
   $('#skels').innerHTML = Object.entries(SKELETONS).map(([k, s]) => `<button data-skel="${k}" aria-pressed="${k === st.skel}" title="${esc(s.tip)}">${esc(s.name)}</button>`).join('');
   $('#pack').innerHTML = Object.entries(PACKS).map(([k, p]) => `<option value="${k}" ${k === st.pack ? 'selected' : ''}>${esc(p.name)}</option>`).join('');
@@ -839,8 +886,8 @@ document.addEventListener('keydown', (e) => {
   const mod = e.metaKey || e.ctrlKey;
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? doRedo() : doUndo(); return; }
   if (mod || e.altKey) return;
-  if (e.key === ' ' && tag !== 'BUTTON' && !e.target.closest?.('.frag')) { e.preventDefault(); rollAll(); }
-  if (['1', '2', '3', '4'].includes(e.key)) rollOne('s' + (+e.key - 1));
+  if (e.key === ' ' && tag !== 'BUTTON' && !e.target.closest?.('.frag')) { e.preventDefault(); if (tab === 'side') rollOne('quest'); else rollAll(); }
+  if (tab === 'main' && ['1', '2', '3', '4'].includes(e.key)) rollOne('s' + (+e.key - 1));
 });
 
 document.addEventListener('click', (e) => {
@@ -866,6 +913,18 @@ $('#rollAll').addEventListener('click', () => { const b = $('#rollAll'); b.class
 function doUndo() { if (!undo.length) return; redo.push(clone(st)); st = undo.pop(); store.set('state', st); render(); }
 function doRedo() { if (!redo.length) return; undo.push(clone(st)); st = redo.pop(); store.set('state', st); render(); }
 $('#undo').addEventListener('click', doUndo);
+// вкладки: основной генератор и отдельный побочный квест; выбранная вкладка помнится в этом браузере
+let tab = store.get('tab', 'main') === 'side' ? 'side' : 'main';
+function showTab(t) {
+  tab = t; store.set('tab', t);
+  $('#vMain').hidden = t !== 'main'; $('#vSide').hidden = t !== 'side';
+  document.querySelectorAll('#tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+  if (t === 'main') requestAnimationFrame(drawWires);
+}
+$('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
+$('#rollQuest').addEventListener('click', () => { const b = $('#rollQuest'); b.classList.remove('rolling'); void b.offsetWidth; b.classList.add('rolling'); rollOne('quest'); });
+$('#copyQuest').addEventListener('click', () => copyText('# Побочный квест\n\n' + questText()));
+showTab(tab);
 $('#redo').addEventListener('click', doRedo);
 
 // смена скелета: если в шагах есть закреплённое или своё — спросить прямо на странице
