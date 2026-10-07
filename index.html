@@ -154,8 +154,8 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
     <h1 title="Генератор идей для квестов: бросаешь кости — получаешь завязку, ход сюжета, выбор игрока и секрет">Кости сюжета</h1>
   </div>
 
-  <h2 class="sec" title="Чего хочет герой и что ему мешает. Из этого собирается идея квеста">Мотив</h2>
-  <section class="motive" id="motive" aria-label="Мотив"></section>
+  <h2 class="sec" title="Чего хочет герой и что ему мешает. Из этого собирается идея квеста">Завязка</h2>
+  <section class="motive" id="motive" aria-label="Завязка"></section>
 
   <div class="panel">
     <div class="seg" id="skels" role="group" aria-label="Тип истории"></div>
@@ -709,7 +709,7 @@ function askSkeleton(k) {
   }, flash); };
   if (!kept) return go();
   const c = $('#confirm');
-  c.innerHTML = `<span>Переключить на «${esc(SKELETONS[k].name)}»? Четыре шага сюжета выпадут заново, даже закреплённые (${kept}). Мотив, действие, выбор и секрет останутся.</span><span></span><button class="btn" id="cfYes">Переключить</button><button class="ghost" id="cfNo">Отмена</button>`;
+  c.innerHTML = `<span>Переключить на «${esc(SKELETONS[k].name)}»? Четыре шага сюжета выпадут заново, даже закреплённые (${kept}). Завязка, действие, выбор и секрет останутся.</span><span></span><button class="btn" id="cfYes">Переключить</button><button class="ghost" id="cfNo">Отмена</button>`;
   c.hidden = false;
   $('#cfYes').onclick = go;
   $('#cfNo').onclick = () => { c.hidden = true; };
@@ -719,7 +719,7 @@ function askSkeleton(k) {
 // текстом
 function asText() {
   const S = SKELETONS[st.skel], c = choiceData(), a = actText(), e = eggText();
-  const L = [`# Квест: ${S.name.toLowerCase()}`, '', ideaText(), '', '## Сюжет'];
+  const L = [`# Квест: ${S.name.toLowerCase()}`, '', '## Завязка', ideaText(), '', '## Сюжет'];
   for (let k = 0; k < 4; k++) { const t = stepText(k); L.push(`${k + 1}. **${S.labels[k]}: ${t.t}** — ${t.d}`); }
   L.push('', `## Действие (на шаге ${st.act.at})`, `**${a.t}** — ${a.d}`);
   L.push('', `## Выбор${st.choice.custom ? '' : ': ' + c.type} (на шаге ${st.choice.at})`, `**${c.t}**`);
