@@ -40,7 +40,7 @@ button, select { font: inherit; color: inherit; }
 .view[hidden] { display: none !important; }
 .tabs { justify-self: start; }
 .credit { position: fixed; left: 16px; bottom: 12px; margin: 0; font-size: 11px; color: var(--muted); z-index: 5; }
-.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.tabs button[aria-selected="true"] { color: var(--bg); }
 .page { max-width: 1100px; margin: 0 auto; padding-inline: 18px; padding-block: 24px 64px; display: grid; gap: 18px; }
 :focus-visible { outline: 3px solid var(--a2); outline-offset: 2px; }
 
@@ -79,9 +79,10 @@ button, select { font: inherit; color: inherit; }
 
 /* пульт */
 .panel { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; flex-wrap: wrap; }
-.seg button { border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--muted); }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.seg { position: relative; isolation: isolate; display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; flex-wrap: wrap; }
+.seg .pill { position: absolute; z-index: -1; background: var(--ink); border-radius: 999px; pointer-events: none; opacity: 0; }
+.seg button { position: relative; border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--muted); transition: color .2s; }
+.seg button[aria-pressed="true"] { color: var(--bg); }
 .btn { border: 0; background: var(--ink); color: var(--bg); border-radius: 999px; padding: 10px 18px; font-weight: 700; cursor: pointer; }
 .btn.dice { padding: 5px 16px; display: grid; place-items: center; }
 .btn.dice svg { width: 46px; height: 29px; display: block; }
@@ -102,7 +103,6 @@ button, select { font: inherit; color: inherit; }
 .ghost { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; font-weight: 600; font-size: 14px; cursor: pointer; }
 .ghost:disabled { opacity: .4; cursor: not-allowed; }
 .sel { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; color: var(--muted); }
-.sel select { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; color: var(--ink); }
 .confirm { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--warn); border-radius: 16px; padding: 10px 14px; font-size: 14px; }
 
 /* доска */
@@ -185,9 +185,8 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
   <div class="panel">
     <h2 class="sec" title="Сюжет квеста по шагам. Шаги 1 и 4, 2 и 3 — пары: конец отвечает на начало">Сюжет</h2>
     <div class="seg" id="skels" role="group" aria-label="Тип истории"></div>
-    <label class="sel" for="pack" title="Набор действий под жанр игры">Жанр
-      <select id="pack"></select>
-    </label>
+    <span class="sel" title="Набор действий под жанр игры. Меняет только карточку «Действие»">Жанр действия</span>
+    <div class="seg" id="packs" role="group" aria-label="Жанр действия"></div>
   </div>
   <div class="confirm" id="confirm" hidden></div>
 
@@ -710,6 +709,36 @@ const icons = (id, o, editable = true) => `<span class="ic">
   ${editable ? `<button data-edit="${id}" aria-label="Написать своё" title="Написать своё">${SVG.pen}</button>` : ''}</span>`;
 const atSel = (id, at) => `<label class="at" for="at-${id}" title="К какому шагу сюжета относится карточка">на шаге <select id="at-${id}" data-at="${id}">${[1, 2, 3, 4].map((n) => `<option ${n === at ? 'selected' : ''}>${n}</option>`).join('')}</select></label>`;
 
+// переключатели: белая таблетка перетекает к выбранному варианту, как капля —
+// передний край убегает вперёд, задний догоняет, по пути капля чуть сплющивается
+const pillAt = new Map();
+const calm = matchMedia('(prefers-reduced-motion: reduce)');
+function pills() {
+  document.querySelectorAll('.seg').forEach((seg) => {
+    if (!seg.offsetParent) return;
+    let pill = seg.querySelector(':scope > .pill');
+    if (!pill) { pill = document.createElement('span'); pill.className = 'pill'; pill.setAttribute('aria-hidden', 'true'); seg.prepend(pill); }
+    const on = seg.querySelector('button[aria-pressed="true"], button[aria-selected="true"]');
+    if (!on) { pill.style.opacity = 0; return; }
+    const to = { l: on.offsetLeft, t: on.offsetTop, w: on.offsetWidth, h: on.offsetHeight };
+    const from = pillAt.get(seg.id);
+    pillAt.set(seg.id, to);
+    Object.assign(pill.style, { left: to.l + 'px', top: to.t + 'px', width: to.w + 'px', height: to.h + 'px', opacity: 1 });
+    if (!from || calm.matches || (from.l === to.l && from.t === to.t && from.w === to.w)) return;
+    pill.getAnimations().forEach((a) => a.cancel());
+    const fr = from.l + from.w, tr = to.l + to.w, fwd = to.l > from.l;
+    const midL = fwd ? from.l + (to.l - from.l) * 0.2 : to.l, midR = fwd ? tr : fr - (fr - tr) * 0.2;
+    const k = (l, r, t, h) => ({ left: l + 'px', width: r - l + 'px', top: t + 'px', height: h + 'px' });
+    pill.animate([
+      k(from.l, fr, from.t, from.h),
+      { ...k(midL, midR, (from.t + to.t) / 2 + to.h * 0.08, to.h * 0.84), offset: 0.45 },
+      k(to.l, tr, to.t, to.h),
+    ], { duration: 340, easing: 'cubic-bezier(.3,.8,.25,1)' });
+  });
+}
+addEventListener('resize', () => { pillAt.clear(); pills(); });
+document.fonts?.ready.then(() => { pillAt.clear(); pills(); });
+
 function render(flash = []) {
   const S = SKELETONS[st.skel];
   // завязка
@@ -724,7 +753,8 @@ function render(flash = []) {
   $('#quest').innerHTML = `<div class="mrow three">${Object.keys(SIDE).map((k) => `<div class="mpart"><div class="mhead"><small>${SIDE[k].label}</small>${icons('q-' + k, st.quest[k], false)}</div><b>${esc(qWord(k)[0])}</b><span class="qd">${esc(qWord(k)[1])}</span>${QADD[qWord(k)[2]] ? `<span class="qadd">${QADD[qWord(k)[2]]}</span>` : ''}</div>`).join('')}</div>`;
   // скелеты и наборы
   $('#skels').innerHTML = Object.entries(SKELETONS).map(([k, s]) => `<button data-skel="${k}" aria-pressed="${k === st.skel}" title="${esc(s.tip)}">${esc(s.name)}</button>`).join('');
-  $('#pack').innerHTML = Object.entries(PACKS).map(([k, p]) => `<option value="${k}" ${k === st.pack ? 'selected' : ''}>${esc(p.name)}</option>`).join('');
+  $('#packs').innerHTML = Object.entries(PACKS).map(([k, p]) => `<button data-pack="${k}" aria-pressed="${k === st.pack}">${esc(p.name)}</button>`).join('');
+  pills();
   // доска
   const mismatch14 = st.steps[0].p !== st.steps[3].p && !st.steps[0].custom && !st.steps[3].custom;
   const mismatch23 = st.steps[1].p !== st.steps[2].p && !st.steps[1].custom && !st.steps[2].custom;
@@ -906,12 +936,12 @@ document.addEventListener('click', (e) => {
   else if (b.dataset.edit) startEdit(b.dataset.edit);
   else if (b.dataset.skel) askSkeleton(b.dataset.skel);
   else if (b.dataset.zmode && b.dataset.zmode !== st.zmode) commit(() => { st.zmode = b.dataset.zmode; });
+  else if (b.dataset.pack && b.dataset.pack !== st.pack) commit(() => { st.pack = b.dataset.pack; if (!st.act.lock) { st.act.i = ri(PACKS[st.pack].items.length); st.act.custom = null; } }, ['act']);
 });
 document.addEventListener('change', (e) => {
   const s = e.target;
   if (editing) finishEdit();
   if (s.dataset.at) { const id = s.dataset.at; commit(() => { st[id].at = +s.value; }, [id]); }
-  if (s.id === 'pack') commit(() => { st.pack = s.value; if (!st.act.lock) { st.act.i = ri(PACKS[st.pack].items.length); st.act.custom = null; } }, ['act']);
 });
 $('#rollAll').addEventListener('click', () => { const b = $('#rollAll'); b.classList.remove('rolling'); void b.offsetWidth; b.classList.add('rolling'); rollAll(); });
 function doUndo() { if (!undo.length) return; redo.push(clone(st)); st = undo.pop(); store.set('state', st); render(); }
@@ -924,6 +954,7 @@ function showTab(t) {
   $('#vMain').hidden = t !== 'main'; $('#vSide').hidden = t !== 'side';
   document.querySelectorAll('#tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
   if (t === 'main') requestAnimationFrame(drawWires);
+  pills();
 }
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 $('#rollQuest').addEventListener('click', () => { const b = $('#rollQuest'); b.classList.remove('rolling'); void b.offsetWidth; b.classList.add('rolling'); rollOne('quest'); });
