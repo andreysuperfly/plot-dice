@@ -27,10 +27,14 @@ Copyright (c) 2026 Андрей Ясеновский (Andrey Yasenovsky)
 3. Проект предоставляется «как есть», без каких-либо гарантий. Автор не несёт
    ответственности за любой ущерб, связанный с использованием проекта.
 
-Чужие материалы внутри проекта этой лицензией не покрываются и остаются
-под условиями своих авторов:
-— вкладка «Побочный квест» — перевод генератора Side-Quest Cards
-  Луки Барбони (Luca Barboni), https://perchance.org/side-quest-cards-generator;
+Вкладка «Побочный квест» — авторская адаптация проекта: вольный перевод,
+герой вместо отряда, переписанная колода «Что поможет», собственные карточки
+и оформление. Эта адаптация покрывается настоящей лицензией. Исходная система
+Side-Quest Cards принадлежит Луке Барбони (Luca Barboni),
+https://perchance.org/side-quest-cards-generator: кому нужен оригинал,
+берёт его у автора.
+
+Чужие материалы внутри проекта:
 — «36 драматических ситуаций» Жоржа Польти (1895) — общественное достояние,
   пересказ сделан для этого проекта;
 — схема «цель — мотивация — конфликт» Дебры Диксон («Goal, Motivation &
@@ -61,8 +65,12 @@ purposes, subject to the following conditions.
 3. The project is provided "as is", without warranty of any kind. The author
    is not liable for any damages arising from its use.
 
-Third-party material inside the project is not covered by this license and
-remains under its authors' terms: the "Side quest" tab is a translation of
-Luca Barboni's Side-Quest Cards generator; Georges Polti's "The Thirty-Six
+The "Side quest" tab is this project's own adaptation (free translation,
+a single hero instead of a party, a rewritten help deck, original cards and
+design) and is covered by this license. The original Side-Quest Cards system
+belongs to Luca Barboni (https://perchance.org/side-quest-cards-generator);
+anyone who needs the original should take it from him.
+
+Third-party material inside the project: Georges Polti's "The Thirty-Six
 Dramatic Situations" (1895) is in the public domain; Debra Dixon's
 "Goal, Motivation & Conflict" scheme is used as an idea only.
