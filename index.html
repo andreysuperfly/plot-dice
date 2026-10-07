@@ -59,7 +59,10 @@ button, select { font: inherit; color: inherit; }
 .sech .sec { margin: 0; }
 .sech .seg { margin-left: 6px; }
 .sech .seg button { padding: 4px 12px; font-size: 13px; }
-.sech .ic button { background: var(--t0); }
+.sech .ic button { background: var(--ink); width: 44px; height: 30px; border-radius: 999px; }
+.sech .ic svg { width: 20px; height: 20px; }
+.sech .ic svg rect { fill: var(--bg); stroke: none; }
+.sech .ic svg .f { fill: var(--ink); }
 .motive { background: var(--t0); border-radius: 26px; padding: 18px; display: grid; gap: 12px; --a: var(--a0); --t: var(--t0); }
 .mrow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .mrow.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -177,6 +180,13 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
     <button role="tab" data-tab="side" aria-selected="false" title="Отдельный генератор коротких побочных квестов по системе Side-Quest Cards Луки Барбони">Побочный квест</button>
   </div>
   <div class="view" id="vMain">
+  <div class="panel">
+    <button class="btn dice" id="rollAll" aria-label="Бросить кости: сюжет, действие, выбор и секрет" title="Бросить сюжет, действие, выбор и секрет. Завязку меняет её кубик. Клавиши: пробел — бросить, 1–4 — бросить один шаг, ⌘/Ctrl+Z — назад"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
+    <button class="ghost" id="undo" aria-label="Отменить">↶ Назад</button>
+    <button class="ghost" id="redo" aria-label="Вернуть">↷ Вперёд</button>
+    <button class="ghost" id="copy" title="Квест целиком обычным текстом — вставить в документ или отправить">Скопировать</button>
+    <button class="ghost" id="fav">В избранное</button>
+  </div>
 
   <div class="sech"><h2 class="sec" title="Чего хочет герой и что ему мешает. Из этого собирается идея квеста">Завязка</h2><span class="ic"><button data-roll="motive" aria-label="Другая завязка" title="Другая завязка. В режиме «По Польти» удержи — выбрать ситуацию из 36"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="3.5"/><circle cx="7.2" cy="7.2" r="1.2" class="f"/><circle cx="10" cy="10" r="1.2" class="f"/><circle cx="12.8" cy="12.8" r="1.2" class="f"/></svg></button></span><div class="seg" id="zmodes" role="group" aria-label="Как строить завязку"></div></div>
   <section class="motive" id="motive" aria-label="Завязка"></section>
@@ -190,13 +200,6 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
   </div>
   <div class="confirm" id="confirm" hidden></div>
 
-  <div class="panel">
-    <button class="btn dice" id="rollAll" aria-label="Бросить кости: сюжет, действие, выбор и секрет" title="Бросить сюжет, действие, выбор и секрет. Завязку меняет её кубик. Клавиши: пробел — бросить, 1–4 — бросить один шаг, ⌘/Ctrl+Z — назад"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
-    <button class="ghost" id="undo" aria-label="Отменить">↶ Назад</button>
-    <button class="ghost" id="redo" aria-label="Вернуть">↷ Вперёд</button>
-    <button class="ghost" id="copy" title="Квест целиком обычным текстом — вставить в документ или отправить">Скопировать</button>
-    <button class="ghost" id="fav">В избранное</button>
-  </div>
 
   <p class="swipe">Схема шире экрана, листай вбок →</p>
   <div class="scroller">
@@ -558,10 +561,9 @@ function rollAll() {
       if (!A.lock) { A.p = p; A.custom = null; flash.push('s' + a); }
       if (!B.lock) { B.p = p; B.custom = null; flash.push('s' + b); }
     }
-    if (!st.act.lock) { st.act.i = ri(PACKS[st.pack].items.length, st.act.i); st.act.custom = null; st.act.at = 1 + ri(3) ; flash.push('act'); }
-    if (!st.choice.lock) { st.choice.i = ri(CHOICES.length, st.choice.i); st.choice.custom = null; st.choice.at = 2 + ri(2); flash.push('choice'); }
-    if (!st.egg.lock) { st.egg.i = ri(SECRETS.length, st.egg.i); st.egg.custom = null; st.egg.at = Math.random() < .7 ? 4 : 1 + ri(3); flash.push('egg'); }
-    if (st.act.at > st.choice.at && !st.act.lock && !st.choice.lock) [st.act.at, st.choice.at] = [st.choice.at, st.act.at];
+    if (!st.act.lock) { st.act.i = ri(PACKS[st.pack].items.length, st.act.i); st.act.custom = null; flash.push('act'); }
+    if (!st.choice.lock) { st.choice.i = ri(CHOICES.length, st.choice.i); st.choice.custom = null; flash.push('choice'); }
+    if (!st.egg.lock) { st.egg.i = ri(SECRETS.length, st.egg.i); st.egg.custom = null; flash.push('egg'); }
   }, flash);
 }
 function rollQuest() { for (const k of Object.keys(SIDE)) if (!st.quest[k].lock) st.quest[k].i = ri(SIDE[k].items.length, st.quest[k].i); }
@@ -737,6 +739,10 @@ function pills() {
   });
 }
 addEventListener('resize', () => { pillAt.clear(); pills(); });
+// при броске блоки не сжимаются: высота только растёт, чтобы страница под ними не прыгала; сброс при смене ширины
+const tall = ['#motive', '#idea', '#board', '#story', '#quest'];
+function steady() { for (const q of tall) { const e = $(q); if (!e || !e.offsetParent) continue; e.style.minHeight = ''; } requestAnimationFrame(() => { for (const q of tall) { const e = $(q); if (!e || !e.offsetParent) continue; const h = e.getBoundingClientRect().height, was = +e.dataset.tall || 0; if (h > was) e.dataset.tall = h; e.style.minHeight = Math.max(h, was) + 'px'; } }); }
+addEventListener('resize', () => { for (const q of tall) { const e = $(q); if (e) { e.dataset.tall = 0; e.style.minHeight = ''; } } steady(); });
 document.fonts?.ready.then(() => { pillAt.clear(); pills(); });
 
 function render(flash = []) {
@@ -754,7 +760,7 @@ function render(flash = []) {
   // скелеты и наборы
   $('#skels').innerHTML = Object.entries(SKELETONS).map(([k, s]) => `<button data-skel="${k}" aria-pressed="${k === st.skel}" title="${esc(s.tip)}">${esc(s.name)}</button>`).join('');
   $('#packs').innerHTML = Object.entries(PACKS).map(([k, p]) => `<button data-pack="${k}" aria-pressed="${k === st.pack}">${esc(p.name)}</button>`).join('');
-  pills();
+  pills(); steady();
   // доска
   const mismatch14 = st.steps[0].p !== st.steps[3].p && !st.steps[0].custom && !st.steps[3].custom;
   const mismatch23 = st.steps[1].p !== st.steps[2].p && !st.steps[1].custom && !st.steps[2].custom;
@@ -954,7 +960,7 @@ function showTab(t) {
   $('#vMain').hidden = t !== 'main'; $('#vSide').hidden = t !== 'side';
   document.querySelectorAll('#tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
   if (t === 'main') requestAnimationFrame(drawWires);
-  pills();
+  pills(); steady();
 }
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 $('#rollQuest').addEventListener('click', () => { const b = $('#rollQuest'); b.classList.remove('rolling'); void b.offsetWidth; b.classList.add('rolling'); rollOne('quest'); });
