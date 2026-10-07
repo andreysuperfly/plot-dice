@@ -38,9 +38,13 @@ p, h1, h2, h3 { margin: 0; }
 button, select { font: inherit; color: inherit; }
 .view { display: grid; gap: 18px; min-width: 0; }
 .view[hidden] { display: none !important; }
-.tabs { justify-self: start; }
+.seg.tabs { margin-left: auto; background: var(--t0); }
+.seg.tabs button { color: var(--a0); }
+.seg.tabs .goo > span { background: var(--a0); }
+.grp { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.grp[hidden] { display: none; }
 .credit { position: fixed; left: 16px; bottom: 12px; margin: 0; font-size: 11px; color: var(--muted); z-index: 5; }
-.tabs button[aria-selected="true"] { color: var(--bg); }
+.seg.tabs button[aria-selected="true"] { color: var(--surface); }
 .page { max-width: 1100px; margin: 0 auto; padding-inline: 18px; padding-block: 24px 64px; display: grid; gap: 18px; }
 :focus-visible { outline: 3px solid var(--a2); outline-offset: 2px; }
 
@@ -97,7 +101,7 @@ button, select { font: inherit; color: inherit; }
 body { overflow-x: clip; }
 .seg { position: relative; isolation: isolate; display: inline-flex; background: var(--surface); border: 0; border-radius: 999px; padding: 0; flex-wrap: wrap; }
 .seg.pouring button { color: var(--muted); }
-.seg .goo { position: absolute; inset: 0; z-index: -1; pointer-events: none; filter: url(#goo); }
+.seg .goo { position: absolute; inset: 0; z-index: -1; pointer-events: none; filter: url(#goo); border-radius: inherit; overflow: hidden; transform: translateZ(0); }
 .seg .goo > span { position: absolute; background: var(--ink); border-radius: 999px; }
 .seg button { position: relative; border: 0; background: transparent; border-radius: 999px; padding: 8px 14px; cursor: pointer; font-weight: 600; font-size: 14px; color: var(--muted); transition: color .2s; }
 .seg button[aria-pressed="true"] { color: var(--bg); }
@@ -193,18 +197,25 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
   <div class="title">
     <h1 title="Генератор идей для квестов: бросаешь кости — получаешь завязку, ход сюжета, выбор игрока и секрет">Кости сюжета</h1>
   </div>
-  <div class="seg tabs" id="tabs" role="tablist" aria-label="Раздел">
-    <button role="tab" data-tab="main" aria-selected="true">Кости сюжета</button>
-    <button role="tab" data-tab="side" aria-selected="false" title="Отдельный генератор коротких побочных квестов по системе Side-Quest Cards Луки Барбони">Побочный квест</button>
+  <div class="panel bar" id="head">
+    <div class="grp" id="mainBtns">
+      <button class="btn dice" id="rollAll" aria-label="Бросить кости: сюжет, действие, выбор и секрет" title="Бросить сюжет, действие, выбор и секрет. Завязку меняет её кубик. Клавиши: пробел — бросить, 1–4 — бросить один шаг, ⌘/Ctrl+Z — назад"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
+      <button class="ghost" id="undo" aria-label="Отменить">↶ Назад</button>
+      <button class="ghost" id="redo" aria-label="Вернуть">↷ Вперёд</button>
+      <button class="ghost" id="copy" title="Квест целиком обычным текстом — вставить в документ или отправить">Скопировать</button>
+      <button class="ghost" id="fav">В избранное</button>
+    </div>
+    <div class="grp" id="sideBtns" hidden>
+      <button class="btn dice" id="rollQuest" aria-label="Сгенерировать побочный квест" title="Сгенерировать побочный квест. Клавиша: пробел"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
+      <button class="ghost" id="copyQuest" title="Побочный квест обычным текстом">Скопировать</button>
+      <button class="ghost" id="favQuest">В избранное</button>
+    </div>
+    <div class="seg tabs" id="tabs" role="tablist" aria-label="Раздел">
+      <button role="tab" data-tab="main" aria-selected="true">Кости сюжета</button>
+      <button role="tab" data-tab="side" aria-selected="false" title="Отдельный генератор коротких побочных квестов по системе Side-Quest Cards Луки Барбони">Побочный квест</button>
+    </div>
   </div>
   <div class="view" id="vMain">
-  <div class="panel bar">
-    <button class="btn dice" id="rollAll" aria-label="Бросить кости: сюжет, действие, выбор и секрет" title="Бросить сюжет, действие, выбор и секрет. Завязку меняет её кубик. Клавиши: пробел — бросить, 1–4 — бросить один шаг, ⌘/Ctrl+Z — назад"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
-    <button class="ghost" id="undo" aria-label="Отменить">↶ Назад</button>
-    <button class="ghost" id="redo" aria-label="Вернуть">↷ Вперёд</button>
-    <button class="ghost" id="copy" title="Квест целиком обычным текстом — вставить в документ или отправить">Скопировать</button>
-    <button class="ghost" id="fav">В избранное</button>
-  </div>
 
   <div class="sech"><h2 class="sec" title="Чего хочет герой и что ему мешает. Из этого собирается идея квеста">Завязка</h2><span class="ic"><button data-roll="motive" aria-label="Другая завязка" title="Другая завязка. В режиме «Польти» удержи — выбрать ситуацию из 36"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="3.5"/><circle cx="7.2" cy="7.2" r="1.2" class="f"/><circle cx="10" cy="10" r="1.2" class="f"/><circle cx="12.8" cy="12.8" r="1.2" class="f"/></svg></button></span><div class="seg" id="zmodes" role="group" aria-label="Как строить завязку"></div></div>
   <section class="motive" id="motive" aria-label="Завязка"></section>
@@ -232,11 +243,6 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
 
   </div>
   <div class="view" id="vSide" hidden>
-    <div class="panel bar">
-      <button class="btn dice" id="rollQuest" aria-label="Сгенерировать побочный квест" title="Сгенерировать побочный квест. Клавиша: пробел"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
-      <button class="ghost" id="copyQuest" title="Побочный квест обычным текстом">Скопировать</button>
-      <button class="ghost" id="favQuest">В избранное</button>
-    </div>
     <section class="motive" id="quest" aria-label="Побочный квест"></section>
     <p class="credit">По системе <a href="https://perchance.org/side-quest-cards-generator" target="_blank" rel="noopener">Side-Quest Cards</a> · автор Лука Барбони · перевод на русский</p>
   </div>
@@ -771,51 +777,61 @@ function pills() {
     if (!from || (from.l === to.l && from.t === to.t && from.w === to.w)) return;
     pill.getAnimations().forEach((x) => x.cancel());
     goo.querySelectorAll('.drop').forEach((x) => x.remove());
-    const H = to.h, R = H / 2, fwd = to.l > from.l || (to.l === from.l && to.t > from.t);
-    const ex = fwd ? from.l + from.w - R : from.l + R, ey = from.t + R;   // откуда выливается
-    const nx = fwd ? to.l + R : to.l + to.w - R, ny = to.t + R;           // куда втекает
-    const cx = to.l + to.w / 2, cy = to.t + R, D = 720;
-    // пока жидкость в пути, подписи серые; надпись темнеет, когда таблетка налилась
-    seg.classList.add('pouring'); clearTimeout(seg._pour); seg._pour = setTimeout(() => seg.classList.remove('pouring'), D * 0.6);
-    const drop = () => { const d = document.createElement('span'); d.className = 'drop'; goo.append(d); return d; };
+    const H = to.h, R = H / 2, fwd = to.l > from.l || (to.l === from.l && to.t > from.t), S = fwd ? 1 : -1;
+    // края в сторону движения: «хвост» сзади, «нос» спереди
+    const Fb = fwd ? from.l : from.l + from.w, Ff = fwd ? from.l + from.w : from.l;
+    const Tb = fwd ? to.l : to.l + to.w, Tf = fwd ? to.l + to.w : to.l;
+    const dist = Math.hypot(Tb - Fb, to.t - from.t), D = Math.min(900, Math.max(560, 480 + dist * 0.9));
     const lerp = (a, b, t) => a + (b - a) * t;
+    const y0 = from.t + R, y1 = to.t + R;
+    seg.classList.add('pouring'); clearTimeout(seg._pour); seg._pour = setTimeout(() => seg.classList.remove('pouring'), D * 0.62);
+    const drop = () => { const d = document.createElement('span'); d.className = 'drop'; goo.append(d); return d; };
     const bye = (x) => x.finished.then(() => x.effect.target.remove(), () => {});
-    // 1) старая таблетка стягивается к выходу в каплю и уходит за струёй
+    const E = 'cubic-bezier(.45,0,.3,1)';
+    // центры: голова (таблетка) летит к цели, хвост отстаёт и тает, между ними тонкая шейка —
+    // фильтр сливает всё в одну жидкую гантель, шейка тянется и рвётся
+    const Fc = from.l + from.w / 2, Tc = to.l + to.w / 2;
+    const at = (t) => [lerp(Fc, Tc, t), lerp(y0, y1, t)];
+    const blob = (c, w, h) => box(c[0] - w / 2, c[1] - h / 2, w, h);
+    const hw = Math.min(from.w, to.w, H * 1.6);
+    // 1) голова — сама таблетка
+    pill.animate([
+      box(from.l, from.t, from.w, from.h),
+      { ...blob(at(0.12), hw * 1.05, H * 0.9), offset: 0.18 },
+      { ...blob(at(0.62), hw * 1.25, H * 0.82), offset: 0.45 },
+      { ...box(to.l - 4, to.t + H * 0.06, to.w + 8, H * 0.88), offset: 0.68 },
+      { ...box(to.l + 2, to.t, to.w - 4, H), offset: 0.82 },
+      box(to.l, to.t, to.w, to.h),
+    ], { duration: D, easing: E });
+    // 2) хвост — остаётся на старом месте, вытягивается и тает вслед за головой
     bye(drop().animate([
       box(from.l, from.t, from.w, from.h),
-      { ...dot(ex, ey, R * 0.95), offset: 0.3, easing: 'cubic-bezier(.4,0,.6,1)' },
-      { ...dot(lerp(ex, nx, 0.3), lerp(ey, ny, 0.3), R * 0.55), offset: 0.55 },
-      dot(lerp(ex, nx, 0.55), lerp(ey, ny, 0.55), 0),
-    ], { duration: D * 0.75, easing: 'cubic-bezier(.5,0,.5,1)', fill: 'both' }));
-    // 2) струя: капли бегут от выхода к новому месту, по пути слипаются и чуть волнуются
-    [0.08, 0.18, 0.28, 0.38].forEach((t0, i) => {
-      const w = (i % 2 ? 1 : -1) * R * 0.22;
-      bye(drop().animate([
-        dot(ex, ey, 0),
-        { ...dot(lerp(ex, nx, 0.15), ey + w * 0.5, R * 0.62), offset: 0.2 },
-        { ...dot(lerp(ex, nx, 0.55), lerp(ey, ny, 0.55) - w, R * 0.7), offset: 0.55 },
-        { ...dot(nx, ny, R * 0.5), offset: 0.9 },
-        dot(nx, ny, R * 0.3),
-      ], { duration: D * 0.45, delay: D * t0, easing: 'cubic-bezier(.45,0,.4,1)', fill: 'both' }));
-    });
-    // 3) на новом месте — водоворот: две капли кружат вокруг центра по сужающейся спирали
+      { ...blob(at(0.02), hw * 0.95, H * 0.84), offset: 0.18 },
+      { ...blob(at(0.25), H * 0.72, H * 0.72), offset: 0.45 },
+      { ...blob(at(0.55), H * 0.42, H * 0.42), offset: 0.6 },
+      { ...blob(at(0.85), H * 0.16, H * 0.16), offset: 0.74 },
+      blob(at(1), 0, 0),
+    ], { duration: D, easing: E, fill: 'both' }));
+    // 3) шейка между хвостом и головой: сначала толстая, потом тоньше и рвётся
+    const neck = (t1, t2, h) => { const p1 = at(t1), p2 = at(t2); return box(Math.min(p1[0], p2[0]), (p1[1] + p2[1]) / 2 - h / 2, Math.abs(p2[0] - p1[0]), h); };
+    bye(drop().animate([
+      neck(0, 0, H * 0.5),
+      { ...neck(0.02, 0.12, H * 0.5), offset: 0.18 },
+      { ...neck(0.25, 0.62, H * 0.3), offset: 0.45 },
+      { ...neck(0.55, 0.8, H * 0.14), offset: 0.58 },
+      { ...neck(0.78, 0.85, 0), offset: 0.68 },
+      neck(0.85, 0.85, 0),
+    ], { duration: D, easing: E, fill: 'both' }));
+    // 3) на новом месте жидкость закручивается: две капли по сужающейся спирали внутри таблетки
+    const cx = to.l + to.w / 2;
     [0, Math.PI].forEach((ph) => {
       const fr = [];
-      for (let i = 0; i <= 10; i++) {
-        const t = i / 10, ang = ph + (fwd ? -1 : 1) * t * Math.PI * 3;
-        fr.push(dot(cx + Math.cos(ang) * (to.w / 2 - R * 0.6) * (1 - t), cy + Math.sin(ang) * R * 0.45 * (1 - t), R * (0.15 + 0.5 * Math.sin(Math.PI * Math.min(1, t * 1.2)))));
+      for (let i = 0; i <= 12; i++) {
+        const t = i / 12, ang = ph + S * t * Math.PI * 2.5;
+        fr.push(dot(cx + Math.cos(ang) * (to.w / 2 - R * 0.7) * (1 - t), y1 + Math.sin(ang) * R * 0.4 * (1 - t), R * (0.12 + 0.38 * Math.sin(Math.PI * t))));
       }
-      bye(drop().animate(fr, { duration: D * 0.5, delay: D * 0.32, easing: 'cubic-bezier(.3,0,.4,1)', fill: 'both' }));
+      bye(drop().animate(fr, { duration: D * 0.45, delay: D * 0.48, easing: 'cubic-bezier(.3,0,.5,1)', fill: 'both' }));
     });
-    // 4) сама таблетка наливается от места втекания до полной, с маленьким перелётом
-    pill.animate([
-      dot(nx, ny, 0),
-      { ...dot(nx, ny, 0), offset: 0.3 },
-      { ...dot(nx, ny, R * 0.8), offset: 0.48 },
-      { ...box(fwd ? to.l : to.l + to.w * 0.4, to.t + H * 0.06, to.w * 0.6, H * 0.88), offset: 0.7 },
-      { ...box(to.l - 3, to.t - 1, to.w + 6, H + 2), offset: 0.86 },
-      box(to.l, to.t, to.w, to.h),
-    ], { duration: D, easing: 'cubic-bezier(.4,0,.3,1)' });
   });
 }
 addEventListener('resize', () => { pillAt.clear(); cardTall.clear(); pills(); });
@@ -1040,6 +1056,7 @@ let tab = store.get('tab', 'main') === 'side' ? 'side' : 'main';
 function showTab(t) {
   tab = t; store.set('tab', t);
   $('#vMain').hidden = t !== 'main'; $('#vSide').hidden = t !== 'side';
+  $('#mainBtns').hidden = t !== 'main'; $('#sideBtns').hidden = t !== 'side';
   document.querySelectorAll('#tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
   if (t === 'main') requestAnimationFrame(drawWires);
   pills(); steady();
