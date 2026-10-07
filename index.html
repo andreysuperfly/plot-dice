@@ -289,7 +289,7 @@ const SKELETONS = {
     ] },
 };
 
-// Завязка, режим «Классика»: четыре колоды бросаются независимо.
+// Завязка, режим «По Диксон» (Goal, Motivation & Conflict) плюс ставка: четыре колоды бросаются независимо.
 const CLASSIC = {
   want:    { label: 'Цель', hint: 'чего хочет', items: ['попасть туда, куда не пускают', 'вернуть потерянное', 'узнать правду', 'спасти близкого', 'добиться признания', 'сбежать', 'отомстить', 'достать одну вещь', 'помириться'] },
   block:   { label: 'Конфликт', hint: 'что мешает', items: ['страж у двери', 'старое правило', 'долг из прошлого', 'собственный страх', 'соперник', 'чужой язык', 'нехватка времени', 'любимый человек', 'плохая репутация'] },
@@ -345,7 +345,7 @@ const ZDECKS = {
     stake: { label: 'Ставка', hint: 'чем это может кончиться', items: null },
   },
 };
-const ZMODES = { classic: 'Классика', polti: 'По Польти' };
+const ZMODES = { classic: 'По Диксон', polti: 'По Польти' };
 
 const PACKS = {
   adv: { name: 'Приключение', items: [
@@ -614,7 +614,7 @@ const atSel = (id, at) => `<label class="at" for="at-${id}" title="К каком
 function render(flash = []) {
   const S = SKELETONS[st.skel];
   // завязка
-  $('#zmodes').innerHTML = Object.entries(ZMODES).map(([k, n]) => `<button data-zmode="${k}" aria-pressed="${st.zmode === k}" title="${k === 'polti' ? 'Ситуация из 36 драматических ситуаций Польти, её роли, осложнение и ставка под неё' : 'Цель, конфликт, мотивация и ставка бросаются независимо'}">${n}</button>`).join('');
+  $('#zmodes').innerHTML = Object.entries(ZMODES).map(([k, n]) => `<button data-zmode="${k}" aria-pressed="${st.zmode === k}" title="${k === 'polti' ? 'Ситуация из 36 драматических ситуаций Польти, её роли, осложнение и ставка под неё' : 'Цель, мотивация и конфликт — по схеме Дебры Диксон, плюс ставка. Все четыре бросаются независимо'}">${n}</button>`).join('');
   const zcards = Object.keys(D()).map((k) => `<div class="mpart"><div class="mhead"><small title="${esc(D()[k].hint[0].toUpperCase() + D()[k].hint.slice(1) + (k === 'sit' ? ': № ' + (M().sit.i + 1) + ' «' + POLTI[M().sit.i].n + '»' : ''))}">${D()[k].label}</small>${icons('m-' + k, M()[k], false)}</div><b>${esc(mWord(k))}</b></div>`);
   if (st.zmode === 'polti') zcards.splice(1, 0, `<div class="mpart roles"><div class="mhead"><small title="Кто против кого. У Польти каждая ситуация — это набор ролей. Меняются вместе с ситуацией">Роли</small></div><b>${esc(POLTI[M().sit.i].r)}</b></div>`);
   $('#motive').innerHTML = `<div class="mrow">${zcards.join('')}</div>
