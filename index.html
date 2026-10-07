@@ -66,6 +66,10 @@ button, select { font: inherit; color: inherit; }
 .motive { background: var(--t0); border-radius: 26px; padding: 18px; display: grid; gap: 12px; --a: var(--a0); --t: var(--t0); }
 .mrow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .mrow.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+/* завязка во всех режимах в две строки, текст карточки — место под две строки: при переключении блок не скачет */
+.mrow.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mrow.two .roles { grid-column: 1 / -1; }
+#motive .mpart b { min-height: 2.5em; }
 .mpart { background: var(--surface); border-radius: 18px; padding: 8px 8px 10px 12px; display: grid; gap: 2px; align-content: start; min-width: 0; }
 .mhead { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
 .mpart .ic button { background: var(--t0); }
@@ -763,7 +767,7 @@ function render(flash = []) {
   const ztext = (k) => st.zmode === 'polti' && k === 'sit' ? POLTI[M().sit.i].n + ': ' + mWord('sit') : mWord(k);
   const zcards = Object.keys(D()).map((k) => `<div class="mpart"><div class="mhead"><small title="${esc(D()[k].hint[0].toUpperCase() + D()[k].hint.slice(1))}">${zlabel(k)}</small>${icons('m-' + k, M()[k], false)}</div><b>${esc(ztext(k))}</b></div>`);
   if (st.zmode === 'polti') zcards.push(`<div class="mpart roles"><div class="mhead"><small title="Кто против кого. У Польти каждая ситуация — это набор ролей. Меняются вместе с ситуацией">Роли</small></div><b>${esc(POLTI[M().sit.i].r)}</b></div>`);
-  $('#motive').innerHTML = `<div class="mrow${st.zmode !== 'classic' ? ' three' : ''}">${zcards.join('')}</div>`;
+  $('#motive').innerHTML = `<div class="mrow ${st.zmode === 'dixon2' ? 'three' : 'two'}">${zcards.join('')}</div>`;
   $('#idea').textContent = ideaText();
   // побочный квест
   $('#quest').innerHTML = `<div class="mrow three">${Object.keys(SIDE).map((k) => `<div class="mpart"><div class="mhead"><small>${SIDE[k].label}</small>${icons('q-' + k, st.quest[k], false)}</div><b>${esc(qWord(k)[0])}</b><span class="qd">${esc(qWord(k)[1])}</span>${QADD[qWord(k)[2]] ? `<span class="qadd">${QADD[qWord(k)[2]]}</span>` : ''}</div>`).join('')}</div>`;
