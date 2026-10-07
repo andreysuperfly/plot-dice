@@ -14,6 +14,8 @@
 
 Действие, выбор и секрет привязаны к шагу сюжета. Пунктирные стрелки показывают, откуда каждая карточка растёт.
 
+- **История.** Под схемой все карточки собраны в короткий связный рассказ: сначала идея, потом шаги по порядку. Наведи на кусок текста — подсветится его карточка; нажми — страница перейдёт к ней.
+
 ## Типы историй
 
 | Тип | Основа | Шаги |
@@ -26,8 +28,8 @@
 
 ## Как пользоваться
 
-- **Бросить** (или пробел) — выпадет новый квест.
-- Кнопки на карточке: **кубик** — другой вариант этой карточки, **замок** — карточка не изменится при броске, **карандаш** — написать своё (карточка закрепится сама).
+- **Кнопка с костями** (или пробел) — выпадет новый квест.
+- Кнопки на карточке: **кубик** — другой вариант этой карточки (если **удержать** кубик или нажать правой кнопкой, откроется список всех вариантов — выбери нужный), **замок** — карточка не изменится при броске, **карандаш** — написать своё (карточка закрепится сама).
 - **на шаге ▾** — перенести действие, выбор или секрет к другому шагу сюжета.
 - **Назад / Вперёд** — вернуться к прошлому варианту. Клавиши: `1`–`4` — перебросить шаг, `⌘/Ctrl+Z` — назад.
 - **Скопировать** — квест целиком обычным текстом. **Избранное** хранится только в этом браузере.
@@ -36,8 +38,8 @@
 
 Весь сайт — один файл `index.html`, без сборки и зависимостей. Колоды лежат в начале скрипта отдельным блоком данных: `SKELETONS`, `MOTIVE`, `PACKS`, `CHOICES`, `SECRETS`. Чтобы добавить вариант, допиши строку в нужную колоду. Чтобы перевести, переведи тексты в этих блоках и подписи интерфейса.
 
-У каждого типа истории две колоды пар: `p14` (шаги 1 и 4) и `p23` (шаги 2 и 3). Каждая пара — это `[[название, пояснение], [название, пояснение]]`, и второй элемент пары должен отвечать на первый.
+У каждого типа истории две колоды пар: `p14` (шаги 1 и 4) и `p23` (шаги 2 и 3). Каждая пара — это `[[название, пояснение, фраза для истории], [название, пояснение, фраза для истории]]`. Фраза для истории пишется с маленькой буквы, без точки: перед ней встанет «Сначала», «Потом», «Затем» или «В конце», и второй элемент пары должен отвечать на первый.
 
 ---
 
-**Plot Dice** is a quest idea generator for game writers: a motive, a four-step plot (Propp's fairy tale, detective, heist, kishōtenketsu, tragedy) with paired steps, a player action, a choice with a delayed consequence, and a hidden secret. Roll, lock, rewrite. One static HTML file, no build step. The interface and decks are in Russian for now; all content lives in plain data blocks inside `index.html`, ready for translation.
+**Plot Dice** is a quest idea generator for game writers: a motive, a four-step plot (Propp's fairy tale, detective, heist, kishōtenketsu, tragedy) with paired steps, a player action, a choice with a delayed consequence, and a hidden secret. Roll, lock, rewrite, or hold a die to pick from the full list. Below the board the cards are stitched into a short story; hover a sentence to see its card, click to jump to it. One static HTML file, no build step. The interface and decks are in Russian for now; all content lives in plain data blocks inside `index.html`, ready for translation.
