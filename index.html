@@ -48,6 +48,8 @@ button, select { font: inherit; color: inherit; }
 /* мотив */
 .sec { font-size: 15px; font-weight: 800; margin: 6px 0 -8px; padding-left: 4px; }
 .sec span { color: var(--muted); font-weight: 600; }
+.panel .sec { margin: 0; padding-left: 4px; }
+.tip { position: fixed; z-index: 60; max-width: min(300px, calc(100vw - 32px)); background: var(--ink); color: var(--bg); font-size: 13px; line-height: 1.35; font-weight: 500; padding: 7px 10px; border-radius: 10px; pointer-events: none; }
 .sech { display: flex; align-items: center; gap: 8px; margin: 6px 0 -8px; }
 .sech .sec { margin: 0; }
 .sech .ic button { background: var(--t0); }
@@ -161,6 +163,7 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
   <section class="motive" id="motive" aria-label="Завязка"></section>
 
   <div class="panel">
+    <h2 class="sec" title="Сюжет квеста по шагам. Шаги 1 и 4, 2 и 3 — пары: конец отвечает на начало">Сюжет</h2>
     <div class="seg" id="skels" role="group" aria-label="Тип истории"></div>
     <label class="sel" for="pack" title="Набор действий под жанр игры">Жанр
       <select id="pack"></select>
@@ -176,7 +179,6 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
     <button class="ghost" id="fav">В избранное</button>
   </div>
 
-  <h2 class="sec" id="plotHead" title="Сюжет квеста по шагам. Шаги 1 и 4, 2 и 3 — пары: конец отвечает на начало">Сюжет</h2>
   <p class="swipe">Схема шире экрана, листай вбок →</p>
   <div class="scroller">
     <div class="board" id="board">
@@ -435,6 +437,32 @@ function rollOne(id) {
     else if (id.startsWith('m-')) { const k = id.slice(2); st.motive[k].i = ri(MOTIVE[k].items.length, st.motive[k].i); }
   }, flash);
 }
+// ===================== ПОДСКАЗКИ =====================
+// Свои подсказки вместо title: на некоторых площадках штатную подсказку перекрывает подпись самой площадки.
+const tip = document.createElement('div');
+tip.className = 'tip'; tip.hidden = true; document.body.append(tip);
+let tipTimer = 0, tipEl = null;
+function hideTip() { clearTimeout(tipTimer); tip.hidden = true; tipEl = null; }
+document.addEventListener('pointerover', (e) => {
+  if (e.pointerType === 'touch') return;
+  const el = e.target.closest('[title], [data-tip]');
+  if (!el || el === tipEl) return;
+  if (el.hasAttribute('title')) {
+    el.dataset.tip = el.title; el.removeAttribute('title');
+    if (!el.hasAttribute('aria-label') && !el.hasAttribute('aria-description')) el.setAttribute('aria-description', el.dataset.tip);
+  }
+  hideTip(); tipEl = el;
+  tipTimer = setTimeout(() => {
+    if (tipEl !== el || !el.isConnected) return;
+    tip.textContent = el.dataset.tip; tip.hidden = false;
+    const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = Math.max(16, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 16)) + 'px';
+    tip.style.top = (r.bottom + 8 + h > innerHeight - 8 ? r.top - 8 - h : r.bottom + 8) + 'px';
+  }, 350);
+});
+document.addEventListener('pointerout', (e) => { if (tipEl && !tipEl.contains(e.relatedTarget)) hideTip(); });
+for (const ev of ['pointerdown', 'scroll', 'keydown']) document.addEventListener(ev, hideTip, true);
+
 // ===================== СПИСОК ВАРИАНТОВ (удержать кубик) =====================
 function variants(id) {
   if (id === 'motive') return { cur: st.motive.want.i, list: BUNDLES.map((b) => b[0][0].toUpperCase() + b[0].slice(1)) };
@@ -577,7 +605,6 @@ function render(flash = []) {
   $('#rollAll').title = allLocked ? 'Всё закреплено. Открепи хоть одну карточку' : '';
   $('#undo').disabled = !undo.length; $('#redo').disabled = !redo.length;
   $('#story').innerHTML = storyHTML();
-  $('#plotHead').innerHTML = `Сюжет <span>· ${esc(S.name.toLowerCase())}</span>`;
   requestAnimationFrame(drawWires);
 }
 
