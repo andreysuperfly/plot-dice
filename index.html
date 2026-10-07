@@ -73,7 +73,7 @@ button, select { font: inherit; color: inherit; }
 .qadd { justify-self: start; font-size: 10px; font-weight: 700; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 7px; }
 #quest .idea { font-size: clamp(16px, 2vw, 19px); }
 .mpart.roles .mhead { min-height: 28px; }
-.idea { font-size: clamp(18px, 2.4vw, 22px); font-weight: 700; line-height: 1.35; text-wrap: balance; }
+.idea { font-size: clamp(18px, 2.4vw, 22px); font-weight: 700; line-height: 1.35; text-wrap: balance; margin: 0; padding-inline: 4px; }
 @media (max-width: 760px) { .mrow, .mrow.three { grid-template-columns: 1fr 1fr; } .mrow.three .roles { grid-column: 1 / -1; } }
 @media (max-width: 760px) { .mrow.six { grid-template-columns: 1fr; } }
 
@@ -180,6 +180,7 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
 
   <div class="sech"><h2 class="sec" title="Чего хочет герой и что ему мешает. Из этого собирается идея квеста">Завязка</h2><span class="ic"><button data-roll="motive" aria-label="Другая завязка" title="Другая завязка. В режиме «По Польти» удержи — выбрать ситуацию из 36"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="3.5"/><circle cx="7.2" cy="7.2" r="1.2" class="f"/><circle cx="10" cy="10" r="1.2" class="f"/><circle cx="12.8" cy="12.8" r="1.2" class="f"/></svg></button></span><div class="seg" id="zmodes" role="group" aria-label="Как строить завязку"></div></div>
   <section class="motive" id="motive" aria-label="Завязка"></section>
+  <p class="idea" id="idea" aria-live="polite"></p>
 
   <div class="panel">
     <h2 class="sec" title="Сюжет квеста по шагам. Шаги 1 и 4, 2 и 3 — пары: конец отвечает на начало">Сюжет</h2>
@@ -216,7 +217,6 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
   </section>
   </div>
   <div class="view" id="vSide" hidden>
-    <h2 class="sec">Генератор побочных квестов</h2>
     <div class="panel">
       <button class="btn dice" id="rollQuest" aria-label="Сгенерировать побочный квест" title="Сгенерировать побочный квест. Клавиша: пробел"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
       <button class="ghost" id="copyQuest" title="Побочный квест обычным текстом">Скопировать</button>
@@ -718,8 +718,8 @@ function render(flash = []) {
   const ztext = (k) => st.zmode === 'polti' && k === 'sit' ? POLTI[M().sit.i].n + ': ' + mWord('sit') : mWord(k);
   const zcards = Object.keys(D()).map((k) => `<div class="mpart"><div class="mhead"><small title="${esc(D()[k].hint[0].toUpperCase() + D()[k].hint.slice(1))}">${zlabel(k)}</small>${icons('m-' + k, M()[k], false)}</div><b>${esc(ztext(k))}</b></div>`);
   if (st.zmode === 'polti') zcards.push(`<div class="mpart roles"><div class="mhead"><small title="Кто против кого. У Польти каждая ситуация — это набор ролей. Меняются вместе с ситуацией">Роли</small></div><b>${esc(POLTI[M().sit.i].r)}</b></div>`);
-  $('#motive').innerHTML = `<div class="mrow${st.zmode !== 'classic' ? ' three' : ''}">${zcards.join('')}</div>
-    <p class="idea">${esc(ideaText())}</p>`;
+  $('#motive').innerHTML = `<div class="mrow${st.zmode !== 'classic' ? ' three' : ''}">${zcards.join('')}</div>`;
+  $('#idea').textContent = ideaText();
   // побочный квест
   $('#quest').innerHTML = `<div class="mrow three">${Object.keys(SIDE).map((k) => `<div class="mpart"><div class="mhead"><small>${SIDE[k].label}</small>${icons('q-' + k, st.quest[k], false)}</div><b>${esc(qWord(k)[0])}</b><span class="qd">${esc(qWord(k)[1])}</span>${QADD[qWord(k)[2]] ? `<span class="qadd">${QADD[qWord(k)[2]]}</span>` : ''}</div>`).join('')}</div>`;
   // скелеты и наборы
