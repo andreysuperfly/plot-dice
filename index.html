@@ -45,21 +45,22 @@ button, select { font: inherit; color: inherit; }
 .grp[hidden] { display: none; }
 .credit { position: fixed; left: 16px; bottom: 12px; margin: 0; font-size: 11px; color: var(--muted); z-index: 5; }
 @media (max-width: 760px) { .credit { position: static; } }
-/* телефон: шапка компактнее, чтобы кнопки и вкладки помещались */
-@media (max-width: 600px) {
-  .bar { padding-block: 8px; gap: 6px; }
-  .bar .grp { gap: 6px; }
-  .bar .ghost { padding: 7px 11px; font-size: 13px; }
-  .bar .btn.dice { padding: 4px 12px; }
-  .bar .btn.dice svg { width: 38px; height: 24px; }
-  .bar .seg.tabs { order: -1; margin-left: 0; width: 100%; display: flex; }
-  .bar .seg.tabs button { flex: 1; padding: 7px 10px; font-size: 13px; }
-  .bar .lbl { display: none; }
-  .bar .grp { flex-wrap: nowrap; }
+/* телефон и планшет: шапка компактнее — кнопки мельче, «Назад/Вперёд» стрелками; при ширине от 600 всё в одну строку */
+@media (max-width: 960px) {
+  .bar { padding-block: 8px; gap: 6px; flex-wrap: nowrap; }
+  .bar .grp { gap: 5px; flex-wrap: nowrap; }
   .bar .ghost { padding: 7px 9px; font-size: 12px; white-space: nowrap; }
-  .bar .grp { gap: 5px; }
   .bar .btn.dice { padding: 4px 10px; }
   .bar .btn.dice svg { width: 34px; height: 22px; }
+  .bar .wd { display: none; }
+  .bar .seg.tabs { flex: none; }
+  .bar .seg.tabs button { padding: 7px 10px; font-size: 12px; white-space: nowrap; }
+}
+/* узкий телефон стоя: вкладки отдельной строкой сверху во всю ширину */
+@media (max-width: 600px) {
+  .bar { flex-wrap: wrap; }
+  .bar .seg.tabs { order: -1; margin-left: 0; width: 100%; display: flex; }
+  .bar .seg.tabs button { flex: 1; font-size: 13px; }
 }
 .seg.tabs button[aria-selected="true"] { color: var(--surface); }
 .page { max-width: 1100px; margin: 0 auto; padding-inline: 18px; padding-block: 24px 64px; display: grid; gap: 18px; }
@@ -229,8 +230,8 @@ kbd { font: inherit; font-weight: 700; background: var(--surface); border: 1px s
   <div class="panel bar" id="head">
     <div class="grp" id="mainBtns">
       <button class="btn dice" id="rollAll" aria-label="Бросить кости: сюжет, действие, выбор и секрет" title="Бросить сюжет, действие, выбор и секрет. Завязку меняет её кубик. Клавиши: пробел — бросить, 1–4 — бросить один шаг, ⌘/Ctrl+Z — назад"><svg viewBox="0 0 64 40" aria-hidden="true"><g transform="rotate(-12 18 20)"><rect x="4" y="6" width="28" height="28" rx="7"/><circle cx="11.5" cy="13.5" r="2.6"/><circle cx="24.5" cy="13.5" r="2.6"/><circle cx="18" cy="20" r="2.6"/><circle cx="11.5" cy="26.5" r="2.6"/><circle cx="24.5" cy="26.5" r="2.6"/></g><g transform="rotate(14 46 21)"><rect x="32" y="7" width="28" height="28" rx="7"/><circle cx="39.5" cy="14.5" r="2.6"/><circle cx="52.5" cy="27.5" r="2.6"/><circle cx="46" cy="21" r="2.6"/></g></svg></button>
-      <button class="ghost" id="undo" aria-label="Отменить">↶<span class="lbl"> Назад</span></button>
-      <button class="ghost" id="redo" aria-label="Вернуть">↷<span class="lbl"> Вперёд</span></button>
+      <button class="ghost" id="undo" aria-label="Отменить">↶<span class="wd"> Назад</span></button>
+      <button class="ghost" id="redo" aria-label="Вернуть">↷<span class="wd"> Вперёд</span></button>
       <button class="ghost" id="copy" title="Квест целиком обычным текстом — вставить в документ или отправить">Скопировать</button>
       <button class="ghost" id="fav">В избранное</button>
     </div>
